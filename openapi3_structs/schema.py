@@ -1,0 +1,21 @@
+class Schema(object):
+    def __init__(self):
+        self.title: str
+        self.type: str
+        # self.enum
+        self.required: list[str]
+        self.properties[str]: Schema
+        self.format: str
+        self.minimum: int
+        self.maximum: int
+        self.exclusiveMinimum: int
+        self.exclusiveMaximum: int
+        self.minLength: int
+        self.maxLength: int
+        self.pattern: str
+        self.minProperties: int
+        self.maxProperties: int
+        # self.minItems
+        # self.maxItems
+        # self.multipleOf
+        # self.uniqueItems
