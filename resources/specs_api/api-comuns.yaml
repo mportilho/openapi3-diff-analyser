@@ -1,0 +1,266 @@
+openapi: 3.0.1
+info:
+  title: api-comuns
+  license:
+    name: Apache 2.0
+    url: https://www.bancoamazonia.com.br/
+  version: 0.0.1-SNAPSHOT
+servers:
+- url: https://api-comuns.hml.bancoamazonia.sa
+  description: APIs
+tags:
+- name: Status retornado pelas APIs.
+  description: Gestão do status retornado pela API
+- name: Indisponibilidade agendada para os serviços
+  description: Gestão da indisponibilidade agendada para os serviços
+paths:
+  /open-banking/discovery/v1/outages:
+    get:
+      tags:
+      - Indisponibilidade agendada para os serviços
+      operationId: get
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ResponseDiscoveryOutagesListDTO'
+  /open-banking/discovery/v1/status:
+    get:
+      tags:
+      - Status retornado pelas APIs.
+      operationId: get_1
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ResponseDiscoveryStatusListDTO'
+components:
+  schemas:
+    ValidationResponse:
+      type: object
+      properties:
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationResponseDetails'
+    ValidationResponseDetails:
+      type: object
+      properties:
+        path:
+          type: string
+        message:
+          type: string
+        invalidValue:
+          type: object
+    SimpleErrorResponse:
+      required:
+      - error
+      - error_description
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorResponseDetails'
+        trace:
+          type: string
+    ErrorResponseDetails:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        content:
+          type: object
+    LinksPaginated:
+      type: object
+      properties:
+        self:
+          type: string
+        first:
+          type: string
+        prev:
+          type: string
+        next:
+          type: string
+        last:
+          type: string
+    MetaPaginated:
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+    OutageDTO:
+      type: object
+      properties:
+        outageTime:
+          type: string
+        duration:
+          type: string
+        isPartial:
+          type: boolean
+        explanation:
+          type: string
+    ResponseDiscoveryOutagesListDTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseDiscoveryOutagesListDataDTO'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+    ResponseDiscoveryOutagesListDataDTO:
+      type: object
+      properties:
+        outages:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutageDTO'
+    ResponseDiscoveryStatusListDTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseDiscoveryStatusListDataDTO'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+    ResponseDiscoveryStatusListDataDTO:
+      type: object
+      properties:
+        status:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusDTO'
+    StatusDTO:
+      type: object
+      properties:
+        code:
+          type: string
+        explanation:
+          type: string
+        detectionTime:
+          type: string
+        expectedResolutionTime:
+          type: string
+        updateTime:
+          type: string
+        unavailableEndpoints:
+          type: string

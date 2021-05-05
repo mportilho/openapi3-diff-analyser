@@ -1,0 +1,831 @@
+openapi: 3.0.1
+info:
+  title: api-produtos-servicos
+  license:
+    name: Apache 2.0
+    url: https://www.bancoamazonia.com.br/
+  version: 0.0.1-SNAPSHOT
+servers:
+- url: https://api-produtos-servicos.hml.bancoamazonia.sa
+  description: APIs
+tags:
+- name: Cartões de crédito para Pessoa Juridica
+  description: Gestão de cartões de crédito para Pessoa Juridica.
+- name: Financiamento Pessoa Natural
+  description: Gestão de Financiamento Pessoa Natural
+- name: Adiantamento a Depositante para pessoa natural
+  description: Gestão de Adiantamento a Depositante para pessoa natural
+- name: Adiantamento de Recebíveis de Pessoa Natural.
+  description: Gestão de Adiantamento de Recebíveis de Pessoa Natural.
+- name: Conta Pessoa Natural
+  description: Gestão de Conta Pessoa Natural
+- name: Empréstimo Pessoa Natural
+  description: Gestão de Empréstimo Pessoa Natural
+- name: Empréstimo Pessoa Juridica
+  description: Gestão de pessoa juridica
+- name: Adiantamento de Recebíveis de Pessoa Jurídica.
+  description: Gestão de Adiantamento de Recebíveis de Pessoa Jurídica.
+- name: Adiantamento a Depositante pessoa jurídica
+  description: Gestão dos dados de Adiantamento a Depositante para pessoa jurídica.
+- name: Financiamento pessoa jurídica
+  description: Obtém os dados de Financiamento para pessoa jurídica.
+- name: Cartões de crédito Pessoa Natural
+  description: Gestão de Cartões de crédito Pessoa Natural
+- name: Conta Pessoa Juridica
+  description: Gestão de pessoa juridica
+paths:
+  /open-banking/products-services/v1/personal-invoice-financings:
+    get:
+      tags:
+      - Adiantamento de Recebíveis de Pessoa Natural.
+      operationId: listarPersonalInvoiceFinancing
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/personal-credit-cards:
+    get:
+      tags:
+      - Cartões de crédito Pessoa Natural
+      summary: Cartões de crédito Pessoa Natural
+      description: Este endpoint realiza a consulta de cartões de crédito pessoa natural
+      operationId: listPersonalCreditCards
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/personal-loans:
+    get:
+      tags:
+      - Empréstimo Pessoa Natural
+      summary: Consulta Emprestimo Pessoa Natural
+      description: Este endpoint realiza a consulta de emprestimos de pessoa natural
+      operationId: listarPersonalLoan
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/personal-financings:
+    get:
+      tags:
+      - Financiamento Pessoa Natural
+      operationId: listBusinessLoans
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/business-financings:
+    get:
+      tags:
+      - Financiamento pessoa jurídica
+      operationId: financiamentoPessoaNatural
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/business-unarranged-account-overdraft:
+    get:
+      tags:
+      - Adiantamento a Depositante pessoa jurídica
+      operationId: listarBusinessUnarrangedAccountOverdraft
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/business-accounts:
+    get:
+      tags:
+      - Conta Pessoa Juridica
+      summary: Consulta Contas Pessoa Juridica
+      description: Este endpoint realiza a consulta de contas pessoa juridica
+      operationId: listContasPessoaJuridica
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/business-credit-cards:
+    get:
+      tags:
+      - Cartões de crédito para Pessoa Juridica
+      operationId: listCartaoCreditoPessoaJuridica
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/business-invoice-financings:
+    get:
+      tags:
+      - Adiantamento de Recebíveis de Pessoa Jurídica.
+      operationId: listBusinessInvoiceFinancings
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/business-loans:
+    get:
+      tags:
+      - Empréstimo Pessoa Juridica
+      operationId: listBusinessLoans_1
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/personal-accounts:
+    get:
+      tags:
+      - Conta Pessoa Natural
+      summary: Consulta Contas Pessoa Natural
+      description: Este endpoint realiza a consulta de contas pessoa natural
+      operationId: listContasPessoaNatural
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/products-services/v1/personal-unarranged-account-overdraft:
+    get:
+      tags:
+      - Adiantamento a Depositante para pessoa natural
+      operationId: listPersonalUnarrangedAccountOverdraft
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+components:
+  schemas:
+    ValidationResponse:
+      type: object
+      properties:
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationResponseDetails'
+    ValidationResponseDetails:
+      type: object
+      properties:
+        path:
+          type: string
+        message:
+          type: string
+        invalidValue:
+          type: object
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorResponseDetails'
+        trace:
+          type: string
+    ErrorResponseDetails:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        content:
+          type: object
+    SimpleErrorResponse:
+      required:
+      - error
+      - error_description
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+    CustomPagination:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OpenBankingDTOObject'
+        links:
+          $ref: '#/components/schemas/PaginationLink'
+        meta:
+          $ref: '#/components/schemas/CustomPaginationMeta'
+    CustomPaginationMeta:
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+    OpenBankingDTOObject:
+      type: object
+      properties:
+        brand:
+          type: object
+          description: 'Organização controladora do grupo de instituições financeiras. '
+    PaginationLink:
+      type: object
+      properties:
+        self:
+          type: string
+        first:
+          type: string
+        prev:
+          type: string
+        next:
+          type: string
+        last:
+          type: string

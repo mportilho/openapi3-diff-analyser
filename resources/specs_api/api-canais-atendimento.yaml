@@ -1,0 +1,404 @@
+openapi: 3.0.1
+info:
+  title: api-canais-atendimento
+  license:
+    name: Apache 2.0
+    url: https://www.bancoamazonia.com.br/
+  version: 0.0.1-SNAPSHOT
+servers:
+- url: https://api-canais-atendimento.hml.bancoamazonia.sa
+  description: APIs
+tags:
+- name: Dependências próprias
+  description: Obtém a lista de dependências próprias da instituição financeira
+- name: Terminais de autoatendimento compartilhados
+  description: Obtém a lista de terminais compartilhados de autoatendimento da instituição
+    financeira.
+- name: Canais eletrônicos
+  description: Obtém a lista de canais eletrônicos de atendimento da instituição financeira.
+- name: Correspondentes Bancários
+  description: Obtém a lista de Correspondentes bancários
+- name: Canais de atendimento telefônico
+  description: Obtém a lista de canais telefônicos próprios da instituição financeira.
+paths:
+  /open-banking/channels/v1/banking-agents:
+    get:
+      tags:
+      - Correspondentes Bancários
+      operationId: listarBankingAgents
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/channels/v1/shared-automated-teller-machines:
+    get:
+      tags:
+      - Terminais de autoatendimento compartilhados
+      operationId: listarSharedAutomatedTellerMachines
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/channels/v1/branches:
+    get:
+      tags:
+      - Dependências próprias
+      operationId: listarBranches
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/channels/v1/electronic-channels:
+    get:
+      tags:
+      - Canais eletrônicos
+      operationId: listarEletronicChannels
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+  /open-banking/channels/v1/phone-channels:
+    get:
+      tags:
+      - Canais de atendimento telefônico
+      operationId: listarPhoneChannels
+      parameters:
+      - name: page
+        in: query
+        description: Índice de pesquisa (0..N)
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: Tamanho da página de retorno
+        schema:
+          maximum: 1000
+          type: integer
+          default: 25
+      - name: sort
+        in: query
+        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
+          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        "200":
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CustomPagination'
+components:
+  schemas:
+    ValidationResponse:
+      type: object
+      properties:
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationResponseDetails'
+    ValidationResponseDetails:
+      type: object
+      properties:
+        path:
+          type: string
+        message:
+          type: string
+        invalidValue:
+          type: object
+    SimpleErrorResponse:
+      required:
+      - error
+      - error_description
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorResponseDetails'
+        trace:
+          type: string
+    ErrorResponseDetails:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        content:
+          type: object
+    CustomPagination:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OpenBankingDTOObject'
+        links:
+          $ref: '#/components/schemas/PaginationLink'
+        meta:
+          $ref: '#/components/schemas/CustomPaginationMeta'
+    CustomPaginationMeta:
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+    OpenBankingDTOObject:
+      type: object
+      properties:
+        brand:
+          type: object
+          description: 'Organização controladora do grupo de instituições financeiras. '
+    PaginationLink:
+      type: object
+      properties:
+        self:
+          type: string
+        first:
+          type: string
+        prev:
+          type: string
+        next:
+          type: string
+        last:
+          type: string
