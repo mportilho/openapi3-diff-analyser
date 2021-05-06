@@ -1,9 +1,9 @@
-import os
 from pathlib import Path
+from definitions import ROOT_DIR
 
 import yaml
 
-from processors import schema_processor
+from main import spec_comparator
 
 
 def _load_yaml(openbk_swagger_path: Path):
@@ -15,10 +15,9 @@ def _load_yaml(openbk_swagger_path: Path):
 
 
 def execute_program():
-    openapi_obk = _load_yaml(Path(
-        os.path.join(os.path.expanduser("~"), "temp", "ram", "email openbk hml", "swagger_common_apis.yaml")))
-    openapi_api = _load_yaml(Path(
-        os.path.join(os.path.expanduser("~"), "temp", "ram", "email openbk hml", "api-comuns.yaml")))
+    openapi_obk = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis.yaml"))
+    openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
+    openapi_api = _load_yaml(Path(ROOT_DIR, "resources", "specs_api", "api-canais-atendimento.yaml"))
 
     # openapi_obk = _load_yaml(Path(
     #     os.path.join(os.path.expanduser("~"), "temp", "ram", "email openbk hml", "swagger_channels_apis.yaml")))
@@ -30,15 +29,22 @@ def execute_program():
     # openapi_api = _load_yaml(Path(
     #     os.path.join(os.path.expanduser("~"), "temp", "ram", "email openbk hml", "api-canais-atendimento.yaml")))
 
-    # api-canais-atendimento.yaml
-    schema_obk: dict = schema_processor.process(openapi_obk)
-    schema_api: dict = schema_processor.process(openapi_api)
-
-    print(schema_obk)
-    print(schema_api)
+    spec_comparator.compare_specs(openapi_obk, openapi_obk_control)
 
 
 if __name__ == '__main__':
     execute_program()
+
+    # x = set(['x1', 'rr', 'e4', 'x3'])
+    # y = set(['rr', 'x1', 'x3', 'e4'])
+    #
+    # print("List first: " + str(x))
+    # print("List second: " + str(y))
+    #
+    # # check if list x equals to y
+    # if x == y:
+    #     print("First and Second list are Equal")
+    # else:
+    #     print("First and Second list are Not Equal")
 
 # C:\Users\marce\temp\ram\email openbk hml

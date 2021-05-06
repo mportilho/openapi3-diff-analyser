@@ -1,6 +1,3 @@
-from openapi3_structs.schema import Schema
-
-
 def process(openapi) -> dict:
     component_schemas = openapi['components']['schemas']
     cache: dict = {}
@@ -11,7 +8,7 @@ def process(openapi) -> dict:
     return cache
 
 
-def _process_schema(schema: Schema, schema_source: dict, cache: dict) -> dict:
+def _process_schema(schema: dict, schema_source: dict, cache: dict) -> dict:
     if '$ref' in schema_source:
         key = schema['$ref'].removeprefix('#/components/schemas/')
         schema['$$_ref'] = cache[key]
@@ -40,20 +37,19 @@ def _process_schema(schema: Schema, schema_source: dict, cache: dict) -> dict:
             for each_schema in schema_source[attr]:
                 all_of_schema = _create_new_schema(attr, each_schema)
                 attr_array.append(_process_schema(all_of_schema, each_schema, cache))
-            schema[f'$$_{attr}'] = attr_array
+            schema[f'@_{attr}'] = attr_array
 
     return schema
 
 
 def _create_new_schema(name: str, schema_source: dict = None):
-    schema = Schema()
-    schema['schema_name'] = name
+    schema = {'schema_name': name}
     if schema_source is not None:
         _copy_attributes(schema, schema_source)
     return schema
 
 
-def _copy_attributes(schema: Schema, source: dict):
+def _copy_attributes(schema: dict, source: dict):
     attributes = ['title', 'required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
                   'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties', 'maxProperties',
                   'minItems', 'maxItems', 'default', '$ref', 'allOf', 'oneOf', 'anyOf', 'not']
