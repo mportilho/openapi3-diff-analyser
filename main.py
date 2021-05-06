@@ -35,16 +35,19 @@ def execute_program():
 if __name__ == '__main__':
     execute_program()
 
-    # x = set(['x1', 'rr', 'e4', 'x3'])
-    # y = set(['rr', 'x1', 'x3', 'e4'])
+    # a = {'a1': 1, 'a2': 2}
+    # a. {'b1': 3, 'b2': 4}
+    # print(a)
+
+    # x = set(['A1', 'A2', 'A3', 'A4', 'B1'])
+    # y = set(['A1', 'A2', 'A3', 'A4', 'A5'])
     #
     # print("List first: " + str(x))
     # print("List second: " + str(y))
     #
-    # # check if list x equals to y
-    # if x == y:
-    #     print("First and Second list are Equal")
-    # else:
-    #     print("First and Second list are Not Equal")
+    # equal = x == y
+    # print(f'Equals: {equal}')
+    # print(str(x.difference(y)))
+    # print(str(y.difference(x)))
 
 # C:\Users\marce\temp\ram\email openbk hml

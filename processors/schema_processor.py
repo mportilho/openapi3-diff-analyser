@@ -1,3 +1,7 @@
+from definitions import POINTER_PREFIX, META_SCHEMA_NAME
+import copy
+
+
 def process(openapi) -> dict:
     component_schemas = openapi['components']['schemas']
     cache: dict = {}
@@ -11,10 +15,11 @@ def process(openapi) -> dict:
 def _process_schema(schema: dict, schema_source: dict, cache: dict) -> dict:
     if '$ref' in schema_source:
         key = schema['$ref'].removeprefix('#/components/schemas/')
-        schema['$$_ref'] = cache[key]
+        schema[POINTER_PREFIX + '$ref'] = cache[key]
     elif 'properties' in schema_source:
         for k in schema_source['properties']:
-            property_schema = _create_new_schema(k, schema_source['properties'][k])
+            prop_obj_name = schema[META_SCHEMA_NAME] + '.p[' + k + ']'
+            property_schema = _create_new_schema(prop_obj_name, schema_source['properties'][k])
             schema['properties'][k] = _process_schema(property_schema, schema_source['properties'][k], cache)
     elif 'type' in schema_source and schema_source['type'] == 'array':
         if 'items' not in schema_source:
@@ -35,15 +40,15 @@ def _process_schema(schema: dict, schema_source: dict, cache: dict) -> dict:
         if attr in schema_source:
             attr_array: list = []
             for each_schema in schema_source[attr]:
-                all_of_schema = _create_new_schema(attr, each_schema)
-                attr_array.append(_process_schema(all_of_schema, each_schema, cache))
-            schema[f'@_{attr}'] = attr_array
+                curr_schema = _create_new_schema(attr, each_schema)
+                attr_array.append(_process_schema(curr_schema, each_schema, cache))
+            schema[POINTER_PREFIX + attr] = attr_array
 
     return schema
 
 
 def _create_new_schema(name: str, schema_source: dict = None):
-    schema = {'schema_name': name}
+    schema = {META_SCHEMA_NAME: name}
     if schema_source is not None:
         _copy_attributes(schema, schema_source)
     return schema
