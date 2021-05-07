@@ -526,6 +526,7 @@ components:
         companies:
           type: array
           items:
+            #$ref: '#/components/schemas/ElectronicChannelsCompanies'
             type: object
             required:
               - name
