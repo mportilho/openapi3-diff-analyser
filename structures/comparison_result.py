@@ -2,10 +2,10 @@ class ComparisonResult(object):
 
     def __init__(self, attribute_name: str):
         self.attr_name: str = attribute_name
-        self.equivalent: bool = None
-        self.reason: str = None
-        self._source: dict = None
-        self._target: dict = None
+        self.equivalent: bool = False
+        self.reason: str = ''
+        self._source: dict = {}
+        self._target: dict = {}
 
     def set_source(self, source):
         if isinstance(source, dict):

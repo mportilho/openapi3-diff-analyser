@@ -30,10 +30,9 @@ def _visit_schema(cache: dict, schema: dict):
         key = schema['$ref'].removeprefix('#/components/schemas/')
         schema[POINTER_PREFIX + '$ref'] = cache[key]
     elif 'type' in schema and schema['type'] == 'array':
-        if 'items' not in schema:
-            raise Exception(f'Schema property defined as array but no "items" property attribute found ')
-        _create_schema_metadata(schema['items'], f"{metadata.name}.p[items]")
-        _visit_schema(cache, schema['items'])
+        if 'items' in schema:
+            _create_schema_metadata(schema['items'], f"{metadata.name}.[items]")
+            _visit_schema(cache, schema['items'])
     elif 'properties' in schema:
         for k in schema['properties']:
             _create_schema_metadata(schema['properties'][k], f"{metadata.name}.p[{k}]")
@@ -52,7 +51,6 @@ def _visit_schema(cache: dict, schema: dict):
             ref_schema_props = cache[key]['properties']
             for prop in ref_schema_props:
                 metadata.all_properties[prop] = ref_schema_props[prop]
-                print()
 
     # dynamic_attr_list = ['allOf', 'oneOf', 'anyOf', 'not']
     # for attr in dynamic_attr_list:
