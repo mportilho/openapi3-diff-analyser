@@ -1,32 +1,33 @@
-from definitions import RESULT_PREFIX, CMP_OID_REF, METADATA_RESULT, METADATA_SCHEMA
-from main.comparison_result import ComparisonResult
-from main.schema_comparison import SchemaComparison
+from definitions import RESULT_PREFIX, CMP_OID_REF, METADATA_RESULT, METADATA_SCHEMA, POINTER_PREFIX
 from processors import schema_visitor
+from structures.comparison_result import ComparisonResult
+from structures.schema_analysis import SchemaResultMetadata, SchemaMetadata
+from structures.schema_comparison import SchemaComparison
 
 
 def _create_result_metadata(schema: dict):
     if METADATA_RESULT not in schema:
-        schema[METADATA_RESULT] = {'analysed': False, 'name': schema[METADATA_SCHEMA]['name'], 'attributes': {}}
+        schema[METADATA_RESULT] = SchemaResultMetadata(schema[METADATA_SCHEMA].name)
 
 
-def compare_schema(source_yaml_spec, target_yaml_spec):
-    source_spec: dict = schema_visitor.visit(source_yaml_spec)
-    target_spec: dict = schema_visitor.visit(target_yaml_spec)
-    schema_comparison = SchemaComparison(source_spec, target_spec)
+def compare_schema(source_yaml_spec, target_yaml_spec) -> SchemaComparison:
+    source_schema_spec: dict = schema_visitor.visit(source_yaml_spec)
+    target_schema_spec: dict = schema_visitor.visit(target_yaml_spec)
+    schema_comparison = SchemaComparison(source_schema_spec, target_schema_spec)
 
     for source_schema_name in schema_comparison.source:
         _compare_schemas(schema_comparison, schema_comparison.result[source_schema_name],
                          schema_comparison.target[source_schema_name])
-    print(schema_comparison)
+    return schema_comparison
 
 
 def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, target_schema: dict):
     _create_result_metadata(source_schema)
-    meta_result = source_schema[METADATA_RESULT]
-    if meta_result['analysed']:
+    meta_result: SchemaResultMetadata = source_schema[METADATA_RESULT]
+    if meta_result.analysed:
         return
 
-    source_schema['analysed'] = True
+    meta_result.analysed = True
     _compare_attributes(source_schema, target_schema)
 
     # 'allOf', 'oneOf', 'anyOf', 'not'
@@ -64,17 +65,16 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
 
 
 def _compare_properties(schema_comparison: SchemaComparison, source_schema: dict, target_schema: dict):
-    source_metadata = source_schema[METADATA_SCHEMA]
-    target_metadata = target_schema[METADATA_SCHEMA]
-    properties_result = ComparisonResult(source_metadata['name'] + '.[properties]')
+    source_metadata: SchemaMetadata = source_schema[METADATA_SCHEMA]
+    target_metadata: SchemaMetadata = target_schema[METADATA_SCHEMA]
+    properties_result = ComparisonResult(source_metadata.name + '.[properties]')
 
     if 'properties' in source_schema and 'properties' in target_schema:
-        source_property: dict = source_metadata['all_properties']
-        target_property: dict = target_metadata['all_properties']
-        source_schema[RESULT_PREFIX + 'properties'] = properties_result
-
+        source_property: dict = source_metadata.all_properties
+        target_property: dict = target_metadata.all_properties
         properties_result.set_source(source_property.keys())
         properties_result.set_target(target_property.keys())
+
         if source_property.keys() == target_property.keys():
             properties_result.equivalent = True
             properties_result.reason = 'Same properties from source to target schema'
@@ -89,12 +89,18 @@ def _compare_properties(schema_comparison: SchemaComparison, source_schema: dict
             if prop in target_property:
                 _compare_schemas(schema_comparison, source_property[prop], target_property[prop])
     elif 'properties' in source_schema:
-        properties_result.set_source(source_schema['properties'])
-        properties_result.reason = 'Schema Property absent on target schema'
+        if '$ref' in target_schema:
+            target_ref_schema = target_schema[POINTER_PREFIX + '$ref']
+            _compare_properties(schema_comparison, source_schema, target_ref_schema)
+        else:
+            properties_result.equivalent = False
+            properties_result.set_source(source_schema['properties'])
+            properties_result.reason = 'Schema Property absent on target schema'
     elif 'properties' in target_schema:
+        properties_result.equivalent = False
         properties_result.set_target(target_schema['properties'])
         properties_result.reason = 'Schema Property absent on source schema'
-    source_schema[RESULT_PREFIX + 'properties'] = properties_result
+    source_schema[METADATA_RESULT].properties = properties_result
 
 
 def _compare_attributes(source_schema: dict, target_schema: dict):
@@ -104,7 +110,7 @@ def _compare_attributes(source_schema: dict, target_schema: dict):
     for attr_name in simple_attr_schema_list:
         result: ComparisonResult = _compare_simple_attribute(attr_name, source_schema, target_schema)
         if result.equivalent is not None:
-            source_schema[METADATA_RESULT]['attributes'] = result
+            source_schema[METADATA_RESULT].attributes[attr_name] = result
 
 
 def _compare_simple_attribute(attr_name: str, source_dict: dict, target_dict: dict) -> ComparisonResult:

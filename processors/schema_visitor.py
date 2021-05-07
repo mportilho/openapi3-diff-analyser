@@ -1,11 +1,12 @@
 import copy
 
 from definitions import POINTER_PREFIX, METADATA_SCHEMA
+from structures.schema_analysis import SchemaMetadata
 
 
 def _create_schema_metadata(schema: dict, name: str):
     if METADATA_SCHEMA not in schema:
-        schema[METADATA_SCHEMA] = {'visited': False, 'name': name, 'all_properties': {}}
+        schema[METADATA_SCHEMA] = SchemaMetadata(name)
 
 
 def visit(openapi) -> dict:
@@ -20,28 +21,28 @@ def visit(openapi) -> dict:
 
 
 def _visit_schema(cache: dict, schema: dict):
-    metadata = schema[METADATA_SCHEMA]
-    if metadata['visited']:
+    metadata: SchemaMetadata = schema[METADATA_SCHEMA]
+    if metadata.visited:
         return
 
-    metadata['visited'] = True
+    metadata.visited = True
     if '$ref' in schema:
         key = schema['$ref'].removeprefix('#/components/schemas/')
         schema[POINTER_PREFIX + '$ref'] = cache[key]
     elif 'type' in schema and schema['type'] == 'array':
         if 'items' not in schema:
             raise Exception(f'Schema property defined as array but no "items" property attribute found ')
-        _create_schema_metadata(schema['items'], f"{metadata['name']}.p[items]")
+        _create_schema_metadata(schema['items'], f"{metadata.name}.p[items]")
         _visit_schema(cache, schema['items'])
     elif 'properties' in schema:
         for k in schema['properties']:
-            _create_schema_metadata(schema['properties'][k], f"{metadata['name']}.p[{k}]")
-            metadata['all_properties'][k] = schema['properties'][k]
+            _create_schema_metadata(schema['properties'][k], f"{metadata.name}.p[{k}]")
+            metadata.all_properties[k] = schema['properties'][k]
             _visit_schema(cache, schema['properties'][k])
 
     if 'additionalProperties' in schema and (
             schema['additionalProperties'] is not True or schema['additionalProperties'] != 'true'):
-        _create_schema_metadata(schema['additionalProperties'], f"{metadata['name']}.[additionalProperties]")
+        _create_schema_metadata(schema['additionalProperties'], f"{metadata.name}.[additionalProperties]")
         _visit_schema(cache, schema['additionalProperties'])
         return schema
 
@@ -50,7 +51,7 @@ def _visit_schema(cache: dict, schema: dict):
             key = curr_schema['$ref'].removeprefix('#/components/schemas/')
             ref_schema_props = cache[key]['properties']
             for prop in ref_schema_props:
-                metadata['all_properties'][prop] = ref_schema_props[prop]
+                metadata.all_properties[prop] = ref_schema_props[prop]
                 print()
 
     # dynamic_attr_list = ['allOf', 'oneOf', 'anyOf', 'not']
