@@ -1,7 +1,7 @@
 from typing import Optional
 
-from definitions import RESULT_PREFIX, METADATA_RESULT, METADATA_SCHEMA, POINTER_PREFIX
-from processors import schema_visitor
+from definitions import METADATA_RESULT, METADATA_SCHEMA
+from processors import schema_processor
 from structures.comparison_result import ComparisonResult
 from structures.schema_analysis import SchemaResultMetadata
 from structures.schema_comparison import SchemaComparison
@@ -13,14 +13,13 @@ def _create_result_metadata(schema: dict):
 
 
 def compare_schema(source_yaml_spec, target_yaml_spec) -> SchemaComparison:
-    source_schema_spec: dict = schema_visitor.visit(source_yaml_spec)
-    target_schema_spec: dict = schema_visitor.visit(target_yaml_spec)
+    source_schema_spec: dict = schema_processor.process(source_yaml_spec)
+    target_schema_spec: dict = schema_processor.process(target_yaml_spec)
     schema_comparison = SchemaComparison(source_schema_spec, target_schema_spec)
     schema_comparison.analyse()
 
-    for source_schema_name in schema_comparison.source:
-        _compare_schemas(schema_comparison, schema_comparison.result[source_schema_name],
-                         schema_comparison.target[source_schema_name])
+    for name in schema_comparison.source:
+        _compare_schemas(schema_comparison, schema_comparison.result[name], schema_comparison.target[name])
     return schema_comparison
 
 
@@ -38,9 +37,9 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
         if '$ref' in source_schema and '$ref' in target_schema:
             meta_result.attributes['$ref'] = _compare_simple_attribute('$ref', source_schema, target_schema)
         elif '$ref' in source_schema:
-            _compare_schemas(schema_comparison, source_schema[POINTER_PREFIX + '$ref'], target_schema)
+            _compare_schemas(schema_comparison, source_schema[METADATA_SCHEMA].ref, target_schema)
         elif '$ref' in target_schema:
-            _compare_schemas(schema_comparison, source_schema, target_schema[POINTER_PREFIX + '$ref'])
+            _compare_schemas(schema_comparison, source_schema, target_schema[METADATA_SCHEMA].ref)
     elif 'properties' in source_schema or 'properties' in target_schema:
         _compare_properties(schema_comparison, source_schema, target_schema)
     elif 'type' in source_schema and source_schema['type'] == 'array':
@@ -85,7 +84,7 @@ def _compare_properties(schema_comparison: SchemaComparison, source_schema: dict
                 _compare_schemas(schema_comparison, source_property[prop], target_property[prop])
     elif 'properties' in source_schema:
         if '$ref' in target_schema:
-            target_ref_schema = target_schema[POINTER_PREFIX + '$ref']
+            target_ref_schema = target_schema[METADATA_SCHEMA].ref
             _compare_properties(schema_comparison, source_schema, target_ref_schema)
         else:
             properties_result.equivalent = False
@@ -99,6 +98,9 @@ def _compare_properties(schema_comparison: SchemaComparison, source_schema: dict
 
 
 def _compare_attributes(source_schema: dict, target_schema: dict):
+    if len(source_schema[METADATA_SCHEMA].ref) > 0 or len(target_schema[METADATA_SCHEMA].ref):
+        return
+
     simple_attr_schema_list = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
                                'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties',
                                'maxProperties', 'minItems', 'maxItems', 'default']

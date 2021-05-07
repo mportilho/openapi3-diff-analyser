@@ -8,6 +8,7 @@ class SchemaMetadata(object):
         self.name: str = name
         self.visited: bool = False
         self.all_properties: dict = {}
+        self.ref: dict = {}
 
     def __str__(self):
         return f"name: {self.name}, visited: {self.visited}"
@@ -28,7 +29,7 @@ class SchemaResultMetadata(object):
                 if not self.attributes[attr].equivalent:
                     self.valid = False
                     break
-        if self.properties is not None:
+        if self.valid and self.properties is not None:
             self.valid = self.properties.equivalent
 
     def __str__(self):

@@ -1,67 +1,67 @@
-from definitions import POINTER_PREFIX, META_SCHEMA_NAME
 import copy
+
+from definitions import METADATA_SCHEMA
+from structures.schema_analysis import SchemaMetadata
+
+
+def _create_schema_metadata(schema: dict, name: str):
+    if METADATA_SCHEMA not in schema:
+        schema[METADATA_SCHEMA] = SchemaMetadata(name)
+
+
+def _copy_schema(schema: dict, name: str = '') -> dict:
+    copy_schema: dict = copy.deepcopy(schema)
+    copy_name: str = name
+    if METADATA_SCHEMA in copy_schema:
+        old_metadata: SchemaMetadata = copy_schema.pop(METADATA_SCHEMA)
+        copy_name = old_metadata.name
+    _create_schema_metadata(copy_schema, copy_name)
+    return copy_schema
 
 
 def process(openapi) -> dict:
     component_schemas = openapi['components']['schemas']
     cache: dict = {}
     for schema_key in component_schemas:
-        cache[schema_key] = _create_new_schema(schema_key, component_schemas[schema_key])
-    for schema_key in component_schemas:
-        _process_schema(cache[schema_key], component_schemas[schema_key], cache)
+        cache[schema_key] = copy.deepcopy(component_schemas[schema_key])
+        _create_schema_metadata(cache[schema_key], schema_key)
+    for schema_key in cache:
+        _visit_schema(cache, cache[schema_key])
     return cache
 
 
-def _process_schema(schema: dict, schema_source: dict, cache: dict) -> dict:
-    if '$ref' in schema_source:
+def _visit_schema(cache: dict, schema: dict):
+    metadata: SchemaMetadata = schema[METADATA_SCHEMA]
+    if metadata.visited:
+        return
+
+    metadata.visited = True
+    if '$ref' in schema:
         key = schema['$ref'].removeprefix('#/components/schemas/')
-        schema[POINTER_PREFIX + '$ref'] = cache[key]
-    elif 'properties' in schema_source:
-        for k in schema_source['properties']:
-            prop_obj_name = schema[META_SCHEMA_NAME] + '.p[' + k + ']'
-            property_schema = _create_new_schema(prop_obj_name, schema_source['properties'][k])
-            schema['properties'][k] = _process_schema(property_schema, schema_source['properties'][k], cache)
-    elif 'type' in schema_source and schema_source['type'] == 'array':
-        if 'items' not in schema_source:
-            raise Exception(f'Schema property defined as array but no "items" property attribute found ')
-        array_schema = _create_new_schema('array_item', schema_source['items'])
-        schema['items'] = _process_schema(array_schema, schema_source['items'], cache)
+        metadata.ref: dict = _copy_schema(cache[key])
+        _visit_schema(cache, metadata.ref)
+    elif 'type' in schema and schema['type'] == 'array':
+        if 'items' in schema:
+            _create_schema_metadata(schema['items'], f"{metadata.name}.[items]")
+            _visit_schema(cache, schema['items'])
+    elif 'properties' in schema:
+        for k in schema['properties']:
+            _create_schema_metadata(schema['properties'][k], f"{metadata.name}.p[{k}]")
+            metadata.all_properties[k] = schema['properties'][k]
+            _visit_schema(cache, schema['properties'][k])
 
-    if 'additionalProperties' in schema_source:
-        if schema_source['additionalProperties'] is True or schema_source['additionalProperties'] == 'true':
-            schema['additionalProperties'] = schema_source['additionalProperties']
-        else:
-            additional_schema = _create_new_schema('additionalProperties', schema_source['additionalProperties'])
-            schema['additionalProperties'] = additional_schema
-            return schema
+    if 'additionalProperties' in schema and (
+            schema['additionalProperties'] is not True or schema['additionalProperties'] != 'true'):
+        _create_schema_metadata(schema['additionalProperties'], f"{metadata.name}.[additionalProperties]")
+        _visit_schema(cache, schema['additionalProperties'])
+        return schema
 
-    dynamic_attr_list = ['allOf', 'oneOf', 'anyOf', 'not']
-    for attr in dynamic_attr_list:
-        if attr in schema_source:
-            attr_array: list = []
-            for each_schema in schema_source[attr]:
-                curr_schema = _create_new_schema(attr, each_schema)
-                attr_array.append(_process_schema(curr_schema, each_schema, cache))
-            schema[POINTER_PREFIX + attr] = attr_array
-
-    return schema
-
-
-def _create_new_schema(name: str, schema_source: dict = None):
-    schema = {META_SCHEMA_NAME: name}
-    if schema_source is not None:
-        _copy_attributes(schema, schema_source)
-    return schema
-
-
-def _copy_attributes(schema: dict, source: dict):
-    attributes = ['title', 'required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
-                  'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties', 'maxProperties',
-                  'minItems', 'maxItems', 'default', '$ref', 'allOf', 'oneOf', 'anyOf', 'not']
-
-    for attr in attributes:
-        if attr in source:
-            schema[attr] = source[attr]
-
-    if 'properties' in source:
-        schema['properties'] = {}
+    # dynamic_attr_list = ['allOf', 'oneOf', 'anyOf', 'not']
+    if 'allOf' in schema:
+        for curr_schema in schema['allOf']:
+            key = curr_schema['$ref'].removeprefix('#/components/schemas/')
+            ref_schema_props = cache[key]['properties']
+            for prop in ref_schema_props:
+                if prop not in metadata.all_properties:
+                    metadata.all_properties[prop] = _copy_schema(ref_schema_props[prop], f"{key}.p[{prop}]")
+                    _visit_schema(cache, metadata.all_properties[prop])

@@ -267,8 +267,8 @@ components:
       required:
         - name
         - companies
-      allOf:
-        - $ref: '#/components/schemas/Brand'
+      #allOf:
+      #  - $ref: '#/components/schemas/Brand' # Brand e BankingAgentsBrand possuem name, nao gera erro
       properties:
         name:
           type: string
@@ -285,18 +285,18 @@ components:
       required:
         - name
         - cnpjNumber
-        - contractors
+        #- contractors
       properties:
         name:
           type: string
-          maxLength: 80
-          pattern: \w*\W*
+          maxLength: 60 # Previous: 80
+          #pattern: \w*\W*
           description: Nome da Instituição, pertencente à marca, responsável pelo Correspondente Bancário no país.
           example: 'Empresa da Organização A'
         contractors:
           type: array
-          items:
-            $ref: '#/components/schemas/BankingAgentsContractor'
+          #items:
+          #  $ref: '#/components/schemas/BankingAgentsContractor'
           minItems: 1
           description: Relação de informações de um contratante do serviço de correspondente.
       allOf:
@@ -316,8 +316,14 @@ components:
           items:
             $ref: '#/components/schemas/BankingAgent'
           minItems: 1
-      allOf:
-        - $ref: '#/components/schemas/CNPJ'
+        cnpjNumber: # adicionado de allOf: - $ref: '#/components/schemas/CNPJ'
+          type: string
+          pattern: '^(\d{14})$|^NA$'
+          description: Número completo do CNPJ da instituição
+          maxLength: 14
+          example: "50685362000135"
+      #allOf:
+      #  - $ref: '#/components/schemas/CNPJ'
     ResponseBranchesList:
       type: object
       required:
@@ -329,9 +335,9 @@ components:
           type: object
           required:
             - brand
-          properties:
-            brand:
-              $ref: '#/components/schemas/BranchesBrand'
+          #properties:
+          #  brand:
+          #    $ref: '#/components/schemas/BranchesBrand'
         links:
           $ref: '#/components/schemas/Links'
         meta:
@@ -520,7 +526,32 @@ components:
         companies:
           type: array
           items:
-            $ref: '#/components/schemas/ElectronicChannelsCompanies'
+            type: object
+            required:
+              - name
+              - electronicChannels
+              - cnpjNumber
+            properties:
+              name:
+                type: string
+                description: Nome da marca selecionada pela Organização proprietária da dependência (titular).
+                example: "Empresa da Marca A"
+                maxLength: 80
+                pattern: \w*\W*
+              urlComplementaryList:
+                type: string
+                maxLength: 1024
+                pattern: \w*\W*
+                example: "https://example.com/mobile-banking"
+              electronicChannels:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ElectronicChannel'
+                minItems: 1
+                maxItems: 4
+                description: Lista  de canais de atendimento eltrônico
+            allOf:
+              - $ref: '#/components/schemas/CNPJ'
           minItems: 1
           description: Lista de instituições pertencentes à marca
     ElectronicChannelsCompanies:
