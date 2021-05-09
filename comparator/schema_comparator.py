@@ -1,9 +1,10 @@
+import copy
 from typing import Optional
 
 from definitions import METADATA_RESULT, METADATA_SCHEMA
 from processor import schema_processor
 from structures.comparison_result import ComparisonResult
-from structures.schema_analysis import SchemaResultMetadata
+from structures.schema_analysis import SchemaResultMetadata, SchemaMetadata
 from structures.schema_comparison import SchemaComparison
 
 
@@ -26,6 +27,8 @@ def compare_schema(source_yaml_spec, target_yaml_spec) -> SchemaComparison:
 def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, target_schema: dict):
     _create_result_metadata(source_schema)
     meta_result: SchemaResultMetadata = source_schema[METADATA_RESULT]
+    source_metadata: SchemaMetadata = source_schema[METADATA_SCHEMA]
+    target_metadata: SchemaMetadata = target_schema[METADATA_SCHEMA]
     if meta_result.analysed:
         return
 
@@ -40,7 +43,7 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
             _compare_schemas(schema_comparison, source_schema[METADATA_SCHEMA].ref, target_schema)
         elif '$ref' in target_schema:
             _compare_schemas(schema_comparison, source_schema, target_schema[METADATA_SCHEMA].ref)
-    elif 'properties' in source_schema or 'properties' in target_schema:
+    elif len(source_metadata.all_properties) > 0 or len(target_metadata.all_properties) > 0:
         _compare_properties(schema_comparison, source_schema, target_schema)
     elif 'type' in source_schema and source_schema['type'] == 'array':
         if 'items' in source_schema and 'items' in target_schema:
@@ -64,11 +67,19 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
 def _compare_properties(schema_comparison: SchemaComparison, source_schema: dict, target_schema: dict):
     properties_result = ComparisonResult(source_schema[METADATA_SCHEMA].name + '.[properties]')
 
-    if 'properties' in source_schema and 'properties' in target_schema:
+    if source_schema[METADATA_SCHEMA].name == 'BankingAgentPostalAddress':
+        print()
+
+    if len(source_schema[METADATA_SCHEMA].all_properties) > 0 or len(target_schema[METADATA_SCHEMA].all_properties) > 0:
         source_property: dict = source_schema[METADATA_SCHEMA].all_properties
         target_property: dict = target_schema[METADATA_SCHEMA].all_properties
-        properties_result.set_source(source_property.keys())
-        properties_result.set_target(target_property.keys())
+        source_keys = set(source_property.keys())
+        target_keys = set(target_property.keys())
+        source_keys.discard(METADATA_SCHEMA)
+        target_keys.discard(METADATA_SCHEMA)
+
+        properties_result.set_source(source_keys)
+        properties_result.set_target(target_keys)
 
         if source_property.keys() == target_property.keys():
             properties_result.equivalent = True
@@ -124,7 +135,10 @@ def _compare_simple_attribute(attr_name: str, source_dict: dict, target_dict: di
             result.equivalent = False
     elif attr_name in source_dict:
         result.reason = f'Attribute "{attr_name}" absent on target schema'
-        result.set_source(source_dict[attr_name])
+        value = copy.deepcopy(source_dict[attr_name])
+        if isinstance(value, dict) and METADATA_SCHEMA in value:
+            value.pop(METADATA_SCHEMA)
+        result.set_source(value)
     elif attr_name in target_dict:
         result.reason = f'Attribute "{attr_name}" absent on source schema'
         result.set_target(target_dict[attr_name])

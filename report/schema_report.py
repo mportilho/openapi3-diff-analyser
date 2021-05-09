@@ -32,9 +32,6 @@ serão apenas mencionados no relatório.\n\n"""
 
 
 def _create_schema_report(schema: dict, is_root=True) -> str:
-    if METADATA_RESULT not in schema:
-        print()
-
     result_metadata: SchemaResultMetadata = schema[METADATA_RESULT]
     report = f"""{'### Schema' if is_root else '#### Sub-Schema'} *{result_metadata.name}*\n\n"""
 
@@ -43,17 +40,19 @@ def _create_schema_report(schema: dict, is_root=True) -> str:
         report += f"""***Atributo '{attr_comparison.attr_name}'***\n"""
         report += f"""- Estado: {'**correto**' if attr_comparison.equivalent else '**incorreto**'}\n"""
         report += f"""- Razão: {attr_comparison.reason}\n"""
-        report += f"""- Dados Esperados: {attr_comparison.get_source()}\n"""
-        report += f"""- Dados Encontrados: {attr_comparison.get_target()}\n\n"""
+        report += f"""- Dados Esperados: `{attr_comparison.get_source()}`\n"""
+        report += f"""- Dados Encontrados: `{attr_comparison.get_target()}`\n\n"""
 
     prop_comparison: ComparisonResult = result_metadata.properties
     if prop_comparison:
         report += '***Propriedades do Schema***\n'
-        report += f"""- Propriedades {'**equivalentes**' if prop_comparison.equivalent else 'incorretas'}\n"""
-        report += f"""- Propriedades Esperadas: {prop_comparison.get_source()}\n"""
-        report += f"""- Propriedades Encontradas: {prop_comparison.get_target()}\n\n"""
+        report += f"""- Estado: {'**correto**' if prop_comparison.equivalent else '**incorreto**'}\n"""
+        report += f"""- Razão: {prop_comparison.reason}\n"""
+        report += f"""- Propriedades Esperadas: `{prop_comparison.get_source()}`\n"""
+        report += f"""- Propriedades Encontradas: `{prop_comparison.get_target()}`\n\n"""
 
     for prop_name in result_metadata.all_properties:
-        report += _create_schema_report(result_metadata.all_properties[prop_name], False)
+        if prop_comparison is not None and prop_comparison.get_target():
+            report += _create_schema_report(result_metadata.all_properties[prop_name], False)
 
     return report

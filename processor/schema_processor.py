@@ -35,10 +35,13 @@ def _visit_schema(cache: dict, schema: dict):
     if metadata.visited:
         return
 
+    if metadata.name == 'BankingAgentPostalAddress':
+        print()
+
     metadata.visited = True
     if '$ref' in schema:
         key = schema['$ref'].removeprefix('#/components/schemas/')
-        metadata.ref: dict = _copy_schema(cache[key])
+        metadata.ref = _copy_schema(cache[key])
         _visit_schema(cache, metadata.ref)
     elif 'type' in schema and schema['type'] == 'array':
         if 'items' in schema:
@@ -63,5 +66,6 @@ def _visit_schema(cache: dict, schema: dict):
             ref_schema_props = cache[key]['properties']
             for prop in ref_schema_props:
                 if prop not in metadata.all_properties:
-                    metadata.all_properties[prop] = _copy_schema(ref_schema_props[prop], f"{key}.p[{prop}]")
+                    metadata.all_properties[prop] = _copy_schema(ref_schema_props[prop],
+                                                                 f"{metadata.name}.p(allOf:{key})[{prop}]")
                     _visit_schema(cache, metadata.all_properties[prop])
