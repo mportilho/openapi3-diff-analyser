@@ -1,7 +1,7 @@
 from typing import Optional
 
 from definitions import METADATA_RESULT, METADATA_SCHEMA
-from processors import schema_processor
+from processor import schema_processor
 from structures.comparison_result import ComparisonResult
 from structures.schema_analysis import SchemaResultMetadata
 from structures.schema_comparison import SchemaComparison
@@ -57,6 +57,7 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
                 items_comp.set_target({})
             items_comp.reason = 'Schema type is array but no "items" attribute defined on source Schemas'
             meta_result.attributes['items'] = items_comp
+    meta_result.all_properties = source_schema[METADATA_SCHEMA].all_properties
     meta_result.finish_analysis()
 
 

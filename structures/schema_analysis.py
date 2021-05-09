@@ -21,6 +21,7 @@ class SchemaResultMetadata(object):
         self.valid: bool = False
         self.attributes: dict = {}
         self.properties: Optional[ComparisonResult] = None
+        self.all_properties: dict = {}
 
     def finish_analysis(self):
         self.valid = True
