@@ -9,6 +9,7 @@ class SchemaMetadata(object):
         self.visited: bool = False
         self.all_properties: dict = {}
         self.ref: dict = {}
+        self.items: dict = {}
 
     def __str__(self):
         return f"name: {self.name}, visited: {self.visited}"
@@ -22,6 +23,10 @@ class SchemaResultMetadata(object):
         self.attributes: dict = {}
         self.properties: Optional[ComparisonResult] = None
         self.all_properties: dict = {}
+        self.items: dict = {}
+
+    def is_empty(self):
+        return len(self.attributes) == 0 and len(self.all_properties) == 0 and self.properties is None
 
     def finish_analysis(self):
         self.valid = True

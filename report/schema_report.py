@@ -13,15 +13,18 @@ Neste item, os Schemas definidos na documentação original serão comparados co
 os Schemas originais presentes na especificação alvo serão analisados em detalhes e os demais ausentes ou extras 
 serão apenas mencionados no relatório.\n\n"""
 
-    report += f"##### Schemas Presentes - {len(schema_comparison.present)} Itens\n\n"
+    found_text = 'item encontrado' if len(schema_comparison.present) <= 1 else 'itens encontrados'
+    report += f"##### Schemas Presentes\n\n{len(schema_comparison.present)} {found_text}:\n\n"
     for found_schema in schema_comparison.present:
         report += f"- {found_schema}\n"
 
-    report += f"\n##### Schemas Ausentes - {len(schema_comparison.absent)} Itens\n\n"
+    found_text = 'item encontrado' if len(schema_comparison.absent) <= 1 else 'itens encontrados'
+    report += f"\n##### Schemas Ausentes\n\n{len(schema_comparison.absent)} {found_text}:\n\n"
     for found_schema in schema_comparison.absent:
         report += f"- {found_schema}\n"
 
-    report += f"\n##### Schemas Extras Encontrados - {len(schema_comparison.extra)} Itens\n\n"
+    found_text = 'item encontrado' if len(schema_comparison.extra) <= 1 else 'itens encontrados'
+    report += f"\n##### Schemas Extras Encontrados\n\n{len(schema_comparison.extra)} {found_text}:\n\n"
     for found_schema in schema_comparison.extra:
         report += f"- {found_schema}\n"
 
@@ -32,6 +35,8 @@ serão apenas mencionados no relatório.\n\n"""
 
 
 def _create_schema_report(schema: dict, is_root=True) -> str:
+    if METADATA_RESULT not in schema:
+        print()
     result_metadata: SchemaResultMetadata = schema[METADATA_RESULT]
     report = f"""{'### Schema' if is_root else '#### Sub-Schema'} *{result_metadata.name}*\n\n"""
 
@@ -43,6 +48,9 @@ def _create_schema_report(schema: dict, is_root=True) -> str:
         report += f"""- Dados Esperados: `{attr_comparison.get_source()}`\n"""
         report += f"""- Dados Encontrados: `{attr_comparison.get_target()}`\n\n"""
 
+    if 'ElectronicChannelsBrand.p[companies].[items]' == result_metadata.name:
+        print()
+
     prop_comparison: ComparisonResult = result_metadata.properties
     if prop_comparison:
         report += '***Propriedades do Schema***\n'
@@ -50,6 +58,9 @@ def _create_schema_report(schema: dict, is_root=True) -> str:
         report += f"""- Razão: {prop_comparison.reason}\n"""
         report += f"""- Propriedades Esperadas: `{prop_comparison.get_source()}`\n"""
         report += f"""- Propriedades Encontradas: `{prop_comparison.get_target()}`\n\n"""
+
+    if result_metadata.items:
+        report += _create_schema_report(result_metadata.items, False)
 
     for prop_name in result_metadata.all_properties:
         if prop_comparison is not None and prop_comparison.get_target():
