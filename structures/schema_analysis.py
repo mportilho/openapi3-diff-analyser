@@ -20,6 +20,7 @@ class SchemaResultMetadata(object):
         self.name: str = name
         self.analysed: bool = False
         self.valid: bool = False
+        self.is_present = True
         self.attributes: dict = {}
         self.properties: Optional[ComparisonResult] = None
         self.all_properties: dict = {}

@@ -8,9 +8,10 @@ from structures.schema_analysis import SchemaResultMetadata, SchemaMetadata
 from structures.schema_comparison import SchemaComparison
 
 
-def _create_result_metadata(schema: dict):
+def _create_result_metadata(schema: dict) -> SchemaResultMetadata:
     if METADATA_RESULT not in schema:
         schema[METADATA_RESULT] = SchemaResultMetadata(schema[METADATA_SCHEMA].name)
+    return schema[METADATA_RESULT]
 
 
 def compare_schema(source_yaml_spec, target_yaml_spec) -> SchemaComparison:
@@ -20,7 +21,14 @@ def compare_schema(source_yaml_spec, target_yaml_spec) -> SchemaComparison:
     schema_comparison.analyse()
 
     for name in schema_comparison.source:
-        _compare_schemas(schema_comparison, schema_comparison.result[name], schema_comparison.target[name])
+        if name in schema_comparison.target:
+            _compare_schemas(schema_comparison, schema_comparison.result[name], schema_comparison.target[name])
+        else:
+            schema: dict = schema_comparison.result[name]
+            result_metadata = _create_result_metadata(schema)
+            result_metadata.analysed = True
+            result_metadata.valid = False
+            result_metadata.is_present = False
     return schema_comparison
 
 
