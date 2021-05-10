@@ -49,7 +49,7 @@ serão apenas mencionados no relatório.\n\n"""
     if error_report:
         report += error_report
     else:
-        report += 'Nenhuma inconformidade encontrada'
+        report += 'Nenhuma inconformidade encontrada nos esquemas presentes'
 
     report += '\n\n-----------------------------\n\n' + schema_report
     return report
