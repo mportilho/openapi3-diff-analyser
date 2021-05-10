@@ -35,8 +35,6 @@ serão apenas mencionados no relatório.\n\n"""
 
 
 def _create_schema_report(schema: dict, is_root=True) -> str:
-    if METADATA_RESULT not in schema:
-        print()
     result_metadata: SchemaResultMetadata = schema[METADATA_RESULT]
     report = f"""{'### Schema' if is_root else '#### Sub-Schema'} *{result_metadata.name}*\n\n"""
 

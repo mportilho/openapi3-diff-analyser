@@ -41,6 +41,9 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
             meta_result.attributes['$ref'] = _compare_simple_attribute('$ref', source_schema, target_schema)
         elif '$ref' in source_schema:
             _compare_schemas(schema_comparison, source_metadata.ref, target_schema)
+            source_schema[METADATA_SCHEMA] = source_metadata.ref[METADATA_SCHEMA]
+            source_schema[METADATA_RESULT] = source_metadata.ref[METADATA_RESULT]
+            return
         elif '$ref' in target_schema:
             _compare_schemas(schema_comparison, source_schema, target_metadata.ref)
     elif len(source_metadata.all_properties) > 0 or len(target_metadata.all_properties) > 0:
@@ -48,10 +51,7 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
     elif 'type' in source_schema and source_schema['type'] == 'array':
         if 'items' in source_schema and 'items' in target_schema:
             _compare_schemas(schema_comparison, source_schema['items'], target_schema['items'])
-            if source_schema['items'][METADATA_RESULT].is_empty():
-                meta_result.items = source_schema['items'][METADATA_SCHEMA].ref
-            else:
-                meta_result.items = source_schema['items']
+            meta_result.items = source_schema['items']
         elif 'items' in source_schema:
             meta_result.attributes['items'] = _compare_simple_attribute('items', source_schema, target_schema)
         else:
