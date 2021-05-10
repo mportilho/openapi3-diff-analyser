@@ -9,13 +9,11 @@ def _create_schema_metadata(schema: dict, name: str):
         schema[METADATA_SCHEMA] = SchemaMetadata(name)
 
 
-def _copy_schema(schema: dict, name: str = '') -> dict:
+def _copy_schema(schema: dict, name: str) -> dict:
     copy_schema: dict = copy.deepcopy(schema)
-    copy_name: str = name
     if METADATA_SCHEMA in copy_schema:
-        old_metadata: SchemaMetadata = copy_schema.pop(METADATA_SCHEMA)
-        copy_name = old_metadata.name
-    _create_schema_metadata(copy_schema, copy_name)
+        copy_schema.pop(METADATA_SCHEMA)
+    _create_schema_metadata(copy_schema, name)
     return copy_schema
 
 
@@ -41,18 +39,17 @@ def _visit_schema(cache: dict, schema: dict):
     metadata.visited = True
     if '$ref' in schema:
         key = schema['$ref'].removeprefix('#/components/schemas/')
-        metadata.ref = _copy_schema(cache[key])
+        metadata.ref = _copy_schema(cache[key], f"{metadata.name}.ref[{key}]")
         _visit_schema(cache, metadata.ref)
-    elif 'type' in schema and schema['type'] == 'array':
-        if 'items' in schema:
-            _create_schema_metadata(schema['items'], f"{metadata.name}.[items]")
-            _visit_schema(cache, schema['items'])
+    elif 'items' in schema:
+        _create_schema_metadata(schema['items'], f"{metadata.name}.[items]")
+        metadata.items = schema['items']
+        _visit_schema(cache, schema['items'])
     elif 'properties' in schema:
         for k in schema['properties']:
             _create_schema_metadata(schema['properties'][k], f"{metadata.name}.p[{k}]")
             metadata.all_properties[k] = schema['properties'][k]
             _visit_schema(cache, schema['properties'][k])
-
     if 'additionalProperties' in schema and (
             schema['additionalProperties'] is not True or schema['additionalProperties'] != 'true'):
         _create_schema_metadata(schema['additionalProperties'], f"{metadata.name}.[additionalProperties]")

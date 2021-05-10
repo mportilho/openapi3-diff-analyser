@@ -40,14 +40,18 @@ def _compare_schemas(schema_comparison: SchemaComparison, source_schema: dict, t
         if '$ref' in source_schema and '$ref' in target_schema:
             meta_result.attributes['$ref'] = _compare_simple_attribute('$ref', source_schema, target_schema)
         elif '$ref' in source_schema:
-            _compare_schemas(schema_comparison, source_schema[METADATA_SCHEMA].ref, target_schema)
+            _compare_schemas(schema_comparison, source_metadata.ref, target_schema)
         elif '$ref' in target_schema:
-            _compare_schemas(schema_comparison, source_schema, target_schema[METADATA_SCHEMA].ref)
+            _compare_schemas(schema_comparison, source_schema, target_metadata.ref)
     elif len(source_metadata.all_properties) > 0 or len(target_metadata.all_properties) > 0:
         _compare_properties(schema_comparison, source_schema, target_schema)
     elif 'type' in source_schema and source_schema['type'] == 'array':
         if 'items' in source_schema and 'items' in target_schema:
             _compare_schemas(schema_comparison, source_schema['items'], target_schema['items'])
+            if source_schema['items'][METADATA_RESULT].is_empty():
+                meta_result.items = source_schema['items'][METADATA_SCHEMA].ref
+            else:
+                meta_result.items = source_schema['items']
         elif 'items' in source_schema:
             meta_result.attributes['items'] = _compare_simple_attribute('items', source_schema, target_schema)
         else:
@@ -73,10 +77,12 @@ def _compare_properties(schema_comparison: SchemaComparison, source_schema: dict
     if len(source_schema[METADATA_SCHEMA].all_properties) > 0 or len(target_schema[METADATA_SCHEMA].all_properties) > 0:
         source_property: dict = source_schema[METADATA_SCHEMA].all_properties
         target_property: dict = target_schema[METADATA_SCHEMA].all_properties
-        source_keys = set(source_property.keys())
-        target_keys = set(target_property.keys())
-        source_keys.discard(METADATA_SCHEMA)
-        target_keys.discard(METADATA_SCHEMA)
+        source_keys = list(source_property.keys())
+        target_keys = list(target_property.keys())
+        if METADATA_SCHEMA in source_keys:
+            source_keys.remove(METADATA_SCHEMA)
+        if METADATA_SCHEMA in target_keys:
+            target_keys.remove(METADATA_SCHEMA)
 
         properties_result.set_source(source_keys)
         properties_result.set_target(target_keys)
@@ -116,10 +122,17 @@ def _compare_attributes(source_schema: dict, target_schema: dict):
     simple_attr_schema_list = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
                                'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties',
                                'maxProperties', 'minItems', 'maxItems', 'default']
-    for attr_name in simple_attr_schema_list:
-        result = _compare_simple_attribute(attr_name, source_schema, target_schema)
-        if result is not None:
-            source_schema[METADATA_RESULT].attributes[attr_name] = result
+
+    for attr_name in source_schema:
+        if attr_name in simple_attr_schema_list:
+            result = _compare_simple_attribute(attr_name, source_schema, target_schema)
+            if result is not None:
+                source_schema[METADATA_RESULT].attributes[attr_name] = result
+
+    # for attr_name in simple_attr_schema_list:
+    #     result = _compare_simple_attribute(attr_name, source_schema, target_schema)
+    #     if result is not None:
+    #         source_schema[METADATA_RESULT].attributes[attr_name] = result
 
 
 def _compare_simple_attribute(attr_name: str, source_dict: dict, target_dict: dict) -> Optional[ComparisonResult]:
