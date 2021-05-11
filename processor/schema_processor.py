@@ -1,18 +1,18 @@
 import copy
 
-from definitions import METADATA_SCHEMA
+from definitions import METADATA_OBJ
 from structures.schema_analysis import SchemaMetadata
 
 
 def _create_schema_metadata(schema: dict, name: str):
-    if METADATA_SCHEMA not in schema:
-        schema[METADATA_SCHEMA] = SchemaMetadata(name)
+    if METADATA_OBJ not in schema:
+        schema[METADATA_OBJ] = SchemaMetadata(name)
 
 
 def _copy_schema(schema: dict, name: str) -> dict:
     copy_schema: dict = copy.deepcopy(schema)
-    if METADATA_SCHEMA in copy_schema:
-        copy_schema.pop(METADATA_SCHEMA)
+    if METADATA_OBJ in copy_schema:
+        copy_schema.pop(METADATA_OBJ)
     _create_schema_metadata(copy_schema, name)
     return copy_schema
 
@@ -29,7 +29,7 @@ def process(openapi) -> dict:
 
 
 def _visit_schema(cache: dict, schema: dict):
-    metadata: SchemaMetadata = schema[METADATA_SCHEMA]
+    metadata: SchemaMetadata = schema[METADATA_OBJ]
     if metadata.visited:
         return
 
