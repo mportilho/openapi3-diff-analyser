@@ -22,10 +22,12 @@ def execute_program():
 
     # spec_comparator.compare_specs(openapi_obk, openapi_obk_control)
 
-    components_metadata = analyse_components(openapi_obk)
-    schema_matcher.match_schema(components_metadata, openapi_obk['components']['schemas']['ResponseBankingAgentsList'],
-                                openapi_obk['components']['schemas']['ResponseBankingAgentsList'])
-    print()
+    components = {'base': analyse_components(openapi_obk), 'target': analyse_components(openapi_obk_control)}
+
+    schema_result = schema_matcher.match_schema_specification(components, openapi_obk['components']['schemas'],
+                                                              openapi_obk_control['components']['schemas'])
+
+    print(schema_result)
 
 
 if __name__ == '__main__':

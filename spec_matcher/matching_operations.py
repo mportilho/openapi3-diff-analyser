@@ -1,7 +1,7 @@
 import copy
 from typing import Optional, Callable, Any
 
-from spec_matcher.matchers_structure import AttributeMatchingData
+from spec_metadata.analysis_metadata import AttributeMatchingData
 
 
 def compare_attributes(attr_list: list[str], base_spec: dict, target_spec: dict) -> list[AttributeMatchingData]:
@@ -19,7 +19,7 @@ def _extract_value(attr_name: str, source_object) -> Optional[Any]:
 
 
 def compare_simple_attribute(attr_name, base_spec: dict, target_spec: dict,
-                             value_extractor: Callable[[Any], Any] = _extract_value
+                             value_extractor: Callable[[Any, Any], Any] = _extract_value
                              ) -> Optional[AttributeMatchingData]:
     result = AttributeMatchingData(attr_name)
     if attr_name in base_spec and attr_name in target_spec:

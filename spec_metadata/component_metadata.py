@@ -11,7 +11,7 @@ class ComponentMetadataObject(object):
         self._spec: dict = spec
 
     def get_spec(self):
-        return self._spec
+        return copy.deepcopy(self._spec)
 
 
 class ComponentMetadata(object):
