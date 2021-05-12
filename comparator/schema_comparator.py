@@ -137,11 +137,6 @@ def _compare_attributes(source_schema: dict, target_schema: dict):
             if result is not None:
                 source_schema[METADATA_RESULT].attributes[attr_name] = result
 
-    # for attr_name in simple_attr_schema_list:
-    #     result = _compare_simple_attribute(attr_name, source_schema, target_schema)
-    #     if result is not None:
-    #         source_schema[METADATA_RESULT].attributes[attr_name] = result
-
 
 def _compare_simple_attribute(attr_name: str, source_dict: dict, target_dict: dict) -> Optional[ComparisonResult]:
     result = ComparisonResult(attr_name)

@@ -41,3 +41,17 @@ class SchemaResultMetadata(object):
 
     def __str__(self):
         return f"name: {self.name}, analysed: {self.analysed}, valid: {self.valid}"
+
+
+class PathMetadata(object):
+    def __init__(self, name: str):
+        self.name: str = name
+        self.ref: dict = {}
+
+
+class PathResultMetadata(object):
+    def __init__(self, name: str):
+        self.name: str = name
+        self.analysed: bool = False
+        self.valid: bool = False
+        self.responses: dict = {}

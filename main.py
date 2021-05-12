@@ -2,8 +2,9 @@ from pathlib import Path
 
 import yaml
 
-from comparator import spec_comparator
 from definitions import ROOT_DIR
+from spec_metadata.component_metadata import analyse_components
+from spec_object_matcher import schema_matcher
 
 
 def _load_yaml(openbk_swagger_path: Path):
@@ -19,7 +20,12 @@ def execute_program():
     openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
     openapi_api = _load_yaml(Path(ROOT_DIR, "resources", "specs_api", "api-canais-atendimento.yaml"))
 
-    spec_comparator.compare_specs(openapi_obk, openapi_obk_control)
+    # spec_comparator.compare_specs(openapi_obk, openapi_obk_control)
+
+    components_metadata = analyse_components(openapi_obk)
+    schema_matcher.match_schema(components_metadata, openapi_obk['components']['schemas']['ResponseBankingAgentsList'],
+                                openapi_obk['components']['schemas']['ResponseBankingAgentsList'])
+    print()
 
 
 if __name__ == '__main__':
