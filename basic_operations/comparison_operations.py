@@ -18,6 +18,18 @@ def _extract_value(attr_name: str, source_object) -> Optional[Any]:
     return source_object[attr_name] if attr_name in source_object else None
 
 
+def _is_equal(obj_a, obj_b):
+    if isinstance(obj_a, list):
+        if len(obj_a) != len(obj_b):
+            return False
+        if set(obj_a) == set(obj_b):
+            return True
+        else:
+            return False
+    else:
+        return obj_a == obj_b
+
+
 def compare_simple_field(field_name, base_spec: dict, target_spec: dict,
                          value_extractor: Callable[[Any, Any], Any] = _extract_value
                          ) -> Optional[FieldMatchingData]:
@@ -26,7 +38,7 @@ def compare_simple_field(field_name, base_spec: dict, target_spec: dict,
         expected = copy.deepcopy(value_extractor(field_name, base_spec))
         current = copy.deepcopy(value_extractor(field_name, target_spec))
         result.set_values(expected, current)
-        if expected == current:
+        if _is_equal(expected, current):
             result.reason = 'Atributo validado'
             result.is_matching = True
         else:

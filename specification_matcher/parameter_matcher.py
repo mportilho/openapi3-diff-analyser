@@ -6,7 +6,7 @@ from specification_matcher import schema_matcher
 
 
 def match_parameter(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict, target_spec: dict):
-    field_list = ['name', 'in', 'required', 'allowEmptyValue']
+    field_list = ['name', 'in', 'required', 'deprecated', 'allowEmptyValue', 'allowReserved']
     analysis = ParameterAnalysis(spec_name)
     analysis.fields = comparison_operations.compare_fields(field_list, base_spec, target_spec)
     if 'schema' in base_spec and 'schema' in target_spec:
@@ -15,5 +15,8 @@ def match_parameter(components: dict[str, ComponentMetadata], spec_name: str, ba
         prop_matching_data = compare_simple_field('schema', base_spec, target_spec)
         if prop_matching_data is not None:
             analysis.fields.append(prop_matching_data)
+
+    if 'content' in base_spec and 'content' in target_spec:
+        raise Exception('not yet')
 
     print()

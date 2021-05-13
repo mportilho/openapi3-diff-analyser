@@ -36,10 +36,11 @@ def match_schema(components: dict[str, ComponentMetadata], schema_name: str, bas
             name = schema_name + f".$ref[{comp_obj.name}]"
             return match_schema(components, name, base_spec, comp_obj.get_spec())
 
+    analysis = SchemaAnalysis(schema_name)
     field_list = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
                   'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties',
                   'maxProperties', 'minItems', 'maxItems', 'default']
-    field_matching_data = compare_fields(field_list, base_spec, target_spec)
+    analysis.fields = compare_fields(field_list, base_spec, target_spec)
 
     base_properties = _compose_properties(components['base'], base_spec)
     target_properties = _compose_properties(components['target'], target_spec)
@@ -50,16 +51,14 @@ def match_schema(components: dict[str, ComponentMetadata], schema_name: str, bas
     prop_matching_data = compare_simple_field('properties', base_spec, target_spec, lambda field_name, spec: list(
         spec[field_name].keys()))
     if prop_matching_data is not None:
-        field_matching_data.append(prop_matching_data)
-
-    analysis = SchemaAnalysis(schema_name, field_matching_data)
+        analysis.fields.append(prop_matching_data)
 
     if 'items' in base_spec and 'items' in target_spec:
         analysis.items = match_schema(components, schema_name + '.item', base_spec['items'], target_spec['items'])
     else:
         item_comp = compare_simple_field('items', base_spec, target_spec, lambda a, b: 'Objeto "items"')
         if item_comp is not None:
-            field_matching_data.append(item_comp)
+            analysis.fields.append(item_comp)
 
     prop_analysis_list = list()
     if 'properties' in base_spec:
