@@ -51,4 +51,4 @@ class SchemaAnalysisResult(object):
         self.present: list[str] = []
         self.absent: list[str] = []
         self.extra: list[str] = []
-        self.results: dict = {}
+        self.results: dict[str, SchemaAnalysis] = {}

@@ -5,6 +5,7 @@ import yaml
 from definitions import ROOT_DIR
 from spec_metadata.component_metadata import analyse_components
 from spec_object_matcher import schema_matcher
+from spec_report import schema_report
 
 
 def _load_yaml(openbk_swagger_path: Path):
@@ -26,8 +27,8 @@ def execute_program():
 
     schema_result = schema_matcher.match_schema_specification(components, openapi_obk['components']['schemas'],
                                                               openapi_obk_control['components']['schemas'])
-
-    print(schema_result)
+    text = schema_report.create_report(schema_result)
+    print(text)
 
 
 if __name__ == '__main__':

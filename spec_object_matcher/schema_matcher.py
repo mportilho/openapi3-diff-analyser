@@ -32,11 +32,11 @@ def match_schema(components: dict[str, ComponentMetadata], schema_name: str, bas
             return SchemaAnalysis(schema_name, attr_matching_data)
         elif '$ref' in base_spec:
             comp_obj = components['base'].get_component_by_ref(base_spec['$ref'])
-            name = schema_name + f"[$ref:{comp_obj.name}]"
+            name = schema_name + f".$ref[{comp_obj.name}]"
             return match_schema(components, name, comp_obj.get_spec(), target_spec)
         elif '$ref' in target_spec:
             comp_obj = components['target'].get_component_by_ref(target_spec['$ref'])
-            name = schema_name + f"[$ref:{comp_obj.name}]"
+            name = schema_name + f".$ref[{comp_obj.name}]"
             return match_schema(components, name, base_spec, comp_obj.get_spec())
 
     attr_list = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
@@ -66,9 +66,9 @@ def match_schema(components: dict[str, ComponentMetadata], schema_name: str, bas
 
     prop_analysis_list = list()
     if 'properties' in base_spec:
-        for prop_name in base_spec['properties']:
+        for prop_name, prop in base_spec['properties'].items():
             if 'properties' in target_spec and prop_name in target_spec['properties']:
-                name = schema_name + f".p[{prop_name}]"
+                name = schema_name + f".p[{prop['$$_NAME'] if '$$_NAME' in prop else prop_name}]"
                 prop_analysis = match_schema(components, name, base_spec['properties'][prop_name],
                                              target_spec['properties'][prop_name])
                 prop_analysis_list.append(prop_analysis)
@@ -84,7 +84,8 @@ def _compose_properties(component: ComponentMetadata, schema: dict) -> dict:
         for curr_schema in schema['allOf']:
             comp_metadata = component.get_component_by_ref(curr_schema['$ref'])
             ref_schema_props = comp_metadata.get_spec()['properties']
-            for prop in ref_schema_props:
-                if prop not in properties:
-                    properties[prop] = ref_schema_props[prop]
+            for prop_name in ref_schema_props:
+                if prop_name not in properties:
+                    properties[prop_name] = ref_schema_props[prop_name]
+                    properties[prop_name]['$$_NAME'] = prop_name + f":allOf({comp_metadata.name})"
     return properties
