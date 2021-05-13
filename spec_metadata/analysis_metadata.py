@@ -69,10 +69,12 @@ class ParameterAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self.schema: Optional[SchemaAnalysis] = None
+        self.content: dict[str, MediaTypeAnalysis] = {}
 
     def evaluate(self):
         if self.is_ok is None:
-            self.is_ok = super().evaluate() and eval_analysis_obj(self.schema)
+            is_content = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.content.values()), True)
+            self.is_ok = super().evaluate() and is_content and eval_analysis_obj(self.schema)
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')
         return self.is_ok
@@ -82,10 +84,87 @@ class MediaTypeAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self.schema: Optional[SchemaAnalysis] = None
+        self.encoding: dict[str, EncodingAnalysis] = {}
 
     def evaluate(self):
         if self.is_ok is None:
-            self.is_ok = super().evaluate() and eval_analysis_obj(self.schema)
+            is_encoding = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.encoding.values()), True)
+            self.is_ok = super().evaluate() and is_encoding and eval_analysis_obj(self.schema)
+        if self.is_ok is None:
+            raise Exception('Avaliação de Schema não deve ser None')
+        return self.is_ok
+
+
+class EncodingAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.headers: dict[str, HeaderAnalysis] = {}
+
+    def evaluate(self):
+        if self.is_ok is None:
+            is_headers = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.headers.values()), True)
+            self.is_ok = super().evaluate() and is_headers
+        if self.is_ok is None:
+            raise Exception('Avaliação de Schema não deve ser None')
+        return self.is_ok
+
+
+class HeaderAnalysis(ParameterAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+
+
+class RequestBodyAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.content: dict[str, MediaTypeAnalysis] = {}
+
+
+class ResponsesAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.default: Optional[ResponseAnalysis] = None
+        self.response: dict[str, ResponseAnalysis] = {}
+
+
+class ResponseAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.headers: dict[str, HeaderAnalysis] = {}
+        self.content: dict[str, MediaTypeAnalysis] = {}
+
+
+class OperationAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.parameters: list[ParameterAnalysis] = []
+        self.request_body: Optional[RequestBodyAnalysis] = None
+        self.responses: list[ResponsesAnalysis] = []
+
+
+class PathItemAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.get: Optional[OperationAnalysis] = None
+        self.put: Optional[OperationAnalysis] = None
+        self.post: Optional[OperationAnalysis] = None
+        self.delete: Optional[OperationAnalysis] = None
+        self.options: Optional[OperationAnalysis] = None
+        self.head: Optional[OperationAnalysis] = None
+        self.patch: Optional[OperationAnalysis] = None
+        self.trace: Optional[OperationAnalysis] = None
+        self.parameters: list[ParameterAnalysis] = []
+
+
+class PathAnalysis(GenericAnalysis):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.path_items: dict[str, PathItemAnalysis] = {}
+
+    def evaluate(self):
+        if self.is_ok is None:
+            is_path_items = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.path_items.values()), True)
+            self.is_ok = super().evaluate() and is_path_items
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')
         return self.is_ok

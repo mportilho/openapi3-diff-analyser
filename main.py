@@ -16,7 +16,6 @@ def _load_yaml(openbk_swagger_path: Path):
     return yaml_obj
 
 
-
 def execute_program():
     openapi_obk = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_common_apis.yaml"))
     openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
