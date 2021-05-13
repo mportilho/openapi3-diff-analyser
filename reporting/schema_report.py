@@ -67,18 +67,18 @@ def _create_schema_report(schema_analyse: SchemaAnalysis, is_root=True) -> dict:
     r[REPORT_KEY] = title
     r[ERROR_KEY] = ''
 
-    for attribute in schema_analyse.attributes:
-        attr_report = ''
-        attr_report += f"""##### Atributo '{attribute.attribute_name}'\n"""
-        attr_report += f"""- Estado: {'**correto**' if attribute.is_matching else '**incorreto**'}\n"""
-        attr_report += f"""- Razão: {attribute.reason}\n"""
-        attr_report += f"""- Dados Esperados: `{attribute.get_expected_value()}`\n"""
-        attr_report += f"""- Dados Encontrados: `{attribute.get_current_value()}`\n\n"""
-        r[REPORT_KEY] += attr_report
-        if not attribute.is_matching:
+    for field in schema_analyse.fields:
+        field_report = ''
+        field_report += f"""##### Campo '{field.field_name}'\n"""
+        field_report += f"""- Estado: {'**correto**' if field.is_matching else '**incorreto**'}\n"""
+        field_report += f"""- Razão: {field.reason}\n"""
+        field_report += f"""- Dados Esperados: `{field.get_expected_value()}`\n"""
+        field_report += f"""- Dados Encontrados: `{field.get_current_value()}`\n\n"""
+        r[REPORT_KEY] += field_report
+        if not field.is_matching:
             if not r[ERROR_KEY]:
                 r[ERROR_KEY] = title
-            r[ERROR_KEY] += attr_report
+            r[ERROR_KEY] += field_report
 
     if schema_analyse.items:
         r_items = _create_schema_report(schema_analyse.items, False)

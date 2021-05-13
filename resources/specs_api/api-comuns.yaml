@@ -1,266 +1,222 @@
 openapi: 3.0.1
 info:
-  title: api-comuns
-  license:
-    name: Apache 2.0
-    url: https://www.bancoamazonia.com.br/
-  version: 0.0.1-SNAPSHOT
+  title: OpenAPI definition
+  version: v0
 servers:
-- url: https://api-comuns.hml.bancoamazonia.sa
-  description: APIs
-tags:
-- name: Status retornado pelas APIs.
-  description: Gestão do status retornado pela API
-- name: Indisponibilidade agendada para os serviços
-  description: Gestão da indisponibilidade agendada para os serviços
+  - url: http://localhost:8080
+    description: Generated server url
 paths:
-  /open-banking/discovery/v1/outages:
-    get:
-      tags:
-      - Indisponibilidade agendada para os serviços
-      operationId: get
-      parameters:
-      - name: page
-        in: query
-        description: Índice de pesquisa (0..N)
-        schema:
-          type: integer
-          default: 0
-      - name: size
-        in: query
-        description: Tamanho da página de retorno
-        schema:
-          maximum: 1000
-          type: integer
-          default: 25
-      - name: sort
-        in: query
-        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
-          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
-        schema:
-          type: array
-          items:
-            type: string
-      responses:
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ValidationResponse'
-        "401":
-          description: Unauthorized
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/SimpleErrorResponse'
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/SimpleErrorResponse'
-        "200":
-          description: OK
-          content:
-            application/json;charset=UTF-8:
-              schema:
-                $ref: '#/components/schemas/ResponseDiscoveryOutagesListDTO'
   /open-banking/discovery/v1/status:
     get:
       tags:
-      - Status retornado pelas APIs.
-      operationId: get_1
+        - Discovery
+      summary: Obtem a descrição e detalhes referente aos códigos de status retornados
+        pelas APIs.
+      description: Obtem a descrição e detalhes referente aos códigos de status retornados
+        pelas APIs.
+      operationId: get
       parameters:
-      - name: page
-        in: query
-        description: Índice de pesquisa (0..N)
-        schema:
-          type: integer
-          default: 0
-      - name: size
-        in: query
-        description: Tamanho da página de retorno
-        schema:
-          maximum: 1000
-          type: integer
-          default: 25
-      - name: sort
-        in: query
-        description: "Critério de ordenação no formato: property(,asc|desc). Crité\
-          rio de ordenação padrão é ascendente e múltiplos critérios são suportados."
-        schema:
-          type: array
-          items:
+        - name: page
+          in: query
+          description: Número da página que está sendo requisitada (o valor da primeira
+            página é 1).
+          required: false
+          schema:
+            minimum: 1
             type: string
+            default: "1"
+        - name: page-size
+          in: query
+          description: Quantidade total de registros por páginas.
+          required: false
+          schema:
+            minimum: 1
+            type: string
+            default: "25"
       responses:
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ValidationResponse'
-        "401":
-          description: Unauthorized
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/SimpleErrorResponse'
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/SimpleErrorResponse'
         "200":
           description: OK
           content:
-            application/json;charset=UTF-8:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ResponseDiscoveryStatusListDTO'
+                $ref: '#/components/schemas/ResponseStatus'
+  /open-banking/discovery/v1/outages:
+    get:
+      tags:
+        - Discovery
+      summary: Obtêm a lista de indisponibilidade agendada para os serviços.
+      description: Obtêm a lista de indisponibilidade agendada para os serviços.
+      operationId: get_1
+      parameters:
+        - name: page
+          in: query
+          description: Número da página que está sendo requisitada (o valor da primeira
+            página é 1).
+          required: false
+          schema:
+            minimum: 1
+            type: string
+            default: "1"
+        - name: page-size
+          in: query
+          description: Quantidade total de registros por páginas.
+          required: false
+          schema:
+            minimum: 1
+            type: string
+            default: "25"
+      responses:
+        "200":
+          description: Dados sobre contas pessoa jurídica obtidos com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseOutages'
 components:
   schemas:
-    ValidationResponse:
-      type: object
-      properties:
-        details:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidationResponseDetails'
-    ValidationResponseDetails:
-      type: object
-      properties:
-        path:
-          type: string
-        message:
-          type: string
-        invalidValue:
-          type: object
-    SimpleErrorResponse:
-      required:
-      - error
-      - error_description
-      type: object
-      properties:
-        error:
-          type: string
-        error_description:
-          type: string
-    ErrorResponse:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        path:
-          type: string
-        details:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorResponseDetails'
-        trace:
-          type: string
-    ErrorResponseDetails:
-      required:
-      - code
-      - message
-      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        content:
-          type: object
     LinksPaginated:
       type: object
       properties:
         self:
           type: string
+          description: URL da página atualmente requisitada
+          example: https://api.banco.com.br/open-banking/channels/v1/<resource>
         first:
           type: string
+          description: URL da primeira página de registros
+          example: https://api.banco.com.br/open-banking/channels/v1/<resource>
         prev:
           type: string
+          description: URL da página anterior de registros
         next:
           type: string
+          description: URL da próxima página de registros
         last:
           type: string
+          description: URL da última página de registros
+          example: https://api.banco.com.br/open-banking/channels/v1/<resource>
     MetaPaginated:
+      required:
+        - totalPages
+        - totalRecords
       type: object
       properties:
         totalRecords:
           type: integer
+          description: Total de registros encontrados
           format: int32
+          example: 1
         totalPages:
           type: integer
+          description: Total de páginas para os registros encontrados
           format: int32
-    OutageDTO:
-      type: object
-      properties:
-        outageTime:
-          type: string
-        duration:
-          type: string
-        isPartial:
-          type: boolean
-        explanation:
-          type: string
-    ResponseDiscoveryOutagesListDTO:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ResponseDiscoveryOutagesListDataDTO'
-        links:
-          $ref: '#/components/schemas/LinksPaginated'
-        meta:
-          $ref: '#/components/schemas/MetaPaginated'
-    ResponseDiscoveryOutagesListDataDTO:
-      type: object
-      properties:
-        outages:
-          type: array
-          items:
-            $ref: '#/components/schemas/OutageDTO'
-    ResponseDiscoveryStatusListDTO:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ResponseDiscoveryStatusListDataDTO'
-        links:
-          $ref: '#/components/schemas/LinksPaginated'
-        meta:
-          $ref: '#/components/schemas/MetaPaginated'
-    ResponseDiscoveryStatusListDataDTO:
+          example: 1
+    ResponseDiscoveryStatusData:
       type: object
       properties:
         status:
           type: array
           items:
-            $ref: '#/components/schemas/StatusDTO'
-    StatusDTO:
+            $ref: '#/components/schemas/Status'
+    ResponseStatus:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseDiscoveryStatusData'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+    Status:
+      required:
+        - code
+        - explanation
       type: object
       properties:
         code:
           type: string
+          description: "Condição atual da API:   * `OK` - A implementação é totalmente\
+            \ funcional   * `PARTIAL_FAILURE` - Um ou mais endpoints estão indisponí\
+            veis   * `UNAVAILABLE` - A implementação completa está indisponível  \
+            \ * `SCHEDULED_OUTAGE` - Uma interrupção anunciada está em vigor "
+          example: OK
+          enum:
+            - OK
+            - PARTIAL_FAILURE
+            - UNAVAILABLE
+            - SCHEDULED_OUTAGE
         explanation:
           type: string
+          description: Fornece uma explicação da interrupção atual que pode ser exibida
+            para um cliente final. Será obrigatoriamente preenchido se code tiver
+            algum valor que não seja OK
+          example: Retorno com Sucesso
         detectionTime:
           type: string
+          description: A data e hora em que a interrupção atual foi detectada. Será
+            obrigatoriamente preenchido se a propriedade code for PARTIAL_FAILURE
+            ou UNAVAILABLE
+          example: 2020-07-21T08:30:00Z
         expectedResolutionTime:
           type: string
+          description: A data e hora em que o serviço completo deve continuar (se
+            conhecido). Será obrigatoriamente preenchido se code tiver algum valor
+            que não seja OK
+          example: 2020-07-21T08:30:00Z
         updateTime:
           type: string
+          description: A data e hora em que esse status foi atualizado pela última
+            vez pelo titular dos dados.
+          example: 2020-01-02T01:00:00Z
         unavailableEndpoints:
+          type: array
+          description: Endpoints com indisponibilidade
+          example:
+            - https://api.banco.com.br/open-banking/channels/v1/electronic-channels
+          items:
+            type: string
+            description: Endpoints com indisponibilidade
+            example: "[\"https://api.banco.com.br/open-banking/channels/v1/electronic-channels\"\
+              ]"
+    Outage:
+      required:
+        - duration
+        - explanation
+        - isPartial
+        - outageTime
+      type: object
+      properties:
+        outageTime:
           type: string
+          description: Data e hora planejada do início da indisponibilidade
+          format: date-time
+          example: 2020-07-21T08:30:00Z
+        duration:
+          type: string
+          description: Duração prevista da indisponibilidade
+          example: PT2H30M
+        isPartial:
+          type: boolean
+          description: Flag que indica se a indisponibilidade é parcial (atingindo
+            apenas alguns end points) ou total (atingindo todos os end points)
+          example: false
+        explanation:
+          type: string
+          description: Explicação sobre os motivos da indisponibilidade.
+          example: Atualização do API Gateway
+    ResponseDiscoveryOutagesData:
+      type: object
+      properties:
+        outages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Outage'
+    ResponseOutages:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseDiscoveryOutagesData'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'

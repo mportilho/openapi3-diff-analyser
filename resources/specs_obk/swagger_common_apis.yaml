@@ -48,24 +48,21 @@ components:
   schemas:
     ResponseDiscoveryStatusList:
       type: object
-      required:
-        - data
-        - links
-        - meta
       properties:
         data:
-          type: object
           required:
             - status
+            - links
+            - meta
           properties:
             status:
               type: array
               items:
-                $ref: '#/components/schemas/Status'
-        links:
-          $ref: '#/components/schemas/Links'
-        meta:
-          $ref: '#/components/schemas/Meta'
+                $ref: '#/components/schemas/DiscoveryStatus'
+            links:
+              $ref: '#/components/schemas/LinksPaginated'
+            meta:
+              $ref: '#/components/schemas/MetaPaginated'
     ResponseDiscoveryOutageList:
       type: object
       required:
@@ -74,35 +71,17 @@ components:
         - meta
       properties:
         data:
-          type: array
-          items:
-            required:
-              - outageTime
-              - duration
-              - isPartial
-              - explanation
-            properties:
-              outageTime:
-                type: string
-                description: Data e hora planejada do início da indisponibilidade
-                example: '2020-07-21T08:30:00Z'
-              duration:
-                type: string
-                description: Duração prevista da indisponibilidade
-                example: PT2H30M
-              isPartial:
-                type: boolean
-                description: Flag que indica se a indisponibilidade é parcial (atingindo apenas alguns end points) ou total (atingindo todos os end points)
-                example: false
-              explanation:
-                type: string
-                description: Explicação sobre os motivos da indisponibilidade.
-                example: Atualização do API Gateway
+          type: object
+          properties:
+            outages:
+              type: array
+              items:
+                $ref: '#/components/schemas/DiscoveryOutage'
         links:
-          $ref: '#/components/schemas/Links'
+          $ref: '#/components/schemas/LinksPaginated'
         meta:
-          $ref: '#/components/schemas/Meta'
-    Links:
+          $ref: '#/components/schemas/MetaPaginated'
+    LinksPaginated:
       type: object
       properties:
         self:
@@ -123,7 +102,7 @@ components:
           type: string
           description: URL da última página de registros
           example: 'https://api.banco.com.br/open-banking/channels/v1/<resource>'
-    Meta:
+    MetaPaginated:
       type: object
       properties:
         totalRecords:
@@ -137,7 +116,7 @@ components:
       required:
         - totalRecords
         - totalPages
-    Status:
+    DiscoveryStatus:
       type: object
       required:
         - code
@@ -180,6 +159,25 @@ components:
             type: string
           example:
             - 'https://api.banco.com.br/open-banking/channels/v1/electronic-channels'
+    DiscoveryOutage:
+      type: object
+      required:
+        - outageTime
+        - duration
+        - explanation
+      properties:
+        outageTime:
+          type: string
+        duration:
+          type: string
+        isPartial:
+          type: boolean
+        explanation:
+          type: string
+        unavailableEndpoints:
+          type: array
+          items:
+            type: string
   parameters:
     page:
       name: page
