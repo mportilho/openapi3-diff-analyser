@@ -1,11 +1,13 @@
-from spec_metadata.analysis_metadata import SchemaAnalysisResult, SchemaAnalysis
+from typing import cast
+
+from spec_metadata.analysis_metadata import SchemaAnalysis, ComponentsAnalysis
 
 ERROR_KEY = '_ERROR_'
 REPORT_KEY = '_SCHEMA_'
 RESUME_KEY = '_RESUME_'
 
 
-def create_report(analysis_result: SchemaAnalysisResult) -> str:
+def create_report(comp_analysis: ComponentsAnalysis) -> str:
     report = ''
     report += f"""# Schemas\n
 Análise dos objetos Schema da especificação OpenAPI 3 com base na documentação original.
@@ -15,32 +17,39 @@ os Schemas originais presentes na especificação alvo serão analisados em deta
 serão apenas mencionados no relatório.\n\n"""
 
     report += f"#### Schemas Presentes\n\n"
-    if len(analysis_result.present) > 0:
-        report += f"{len(analysis_result.present)} schemas encontrados:\n\n"
-        for name in analysis_result.present:
+    if comp_analysis.get_schemas():
+        presence = set(comp_analysis.get_field('schemas').get_expected_value()).intersection(
+            comp_analysis.get_field('schemas').get_current_value())
+        report += f"{len(presence)} schemas encontrados:\n\n"
+        for name in presence:
             report += f"- {name}\n"
     else:
         report += 'Nenhum schema encontrado\n\n'
 
     report += f"#### Schemas Ausentes\n\n"
-    if len(analysis_result.absent) > 0:
-        report += f"{len(analysis_result.absent)} schemas encontrados:\n\n"
-        for name in analysis_result.absent:
+    if comp_analysis.get_schemas():
+        presence = set(comp_analysis.get_field('schemas').get_expected_value()).difference(
+            comp_analysis.get_field('schemas').get_current_value())
+        report += f"{len(presence)} schemas encontrados:\n\n"
+        for name in presence:
             report += f"- {name}\n"
     else:
         report += 'Nenhum schema encontrado\n\n'
 
     report += f"#### Schemas Extras Presentes\n\n"
-    if len(analysis_result.extra) > 0:
-        report += f"{len(analysis_result.extra)} schemas encontrados:\n\n"
-        for name in analysis_result.extra:
+    if comp_analysis.get_schemas():
+        presence = set(comp_analysis.get_field('schemas').get_current_value()).difference(
+            comp_analysis.get_field('schemas').get_expected_value())
+        report += f"{len(presence)} schemas encontrados:\n\n"
+        for name in presence:
             report += f"- {name}\n"
     else:
         report += 'Nenhum schema encontrado\n\n'
 
     report_details = {}
-    for schema_name in analysis_result.present:
-        report_details[schema_name] = _create_schema_report(analysis_result.results[schema_name])
+    for schema_name in comp_analysis.get_schemas():
+        report_details[schema_name] = _create_schema_report(
+            cast(SchemaAnalysis, comp_analysis.get_schemas()[schema_name]))
 
     report += '## Resumo das Diferenças Encontradas\n\n'
     schema_report = ''

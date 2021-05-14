@@ -2,6 +2,7 @@ import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
 
+ANALYSIS_COMPONENTS = ['schemas', 'responses', 'parameters', 'requestBodies', 'headers']
 ANALYSIS_SCHEMA_FIELDS = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
                           'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties',
                           'maxProperties', 'minItems', 'maxItems', 'default']

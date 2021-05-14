@@ -4,8 +4,7 @@ import yaml
 
 from definitions import ROOT_DIR
 from reporting import schema_report
-from spec_metadata.component_metadata import analyse_components
-from specification_matcher import schema_matcher
+from specification_matcher.components_matcher import match_components
 
 
 def _load_yaml(openbk_swagger_path: Path):
@@ -21,11 +20,8 @@ def execute_program():
     openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
     openapi_api = _load_yaml(Path(ROOT_DIR, "resources", "specs_api", "api-comuns.yaml"))
 
-    components = {'base': analyse_components(openapi_obk), 'target': analyse_components(openapi_api)}
-
-    schema_result = schema_matcher.match_schema_specification(components, openapi_obk['components']['schemas'],
-                                                              openapi_api['components']['schemas'])
-    text = schema_report.create_report(schema_result)
+    component_analysis = match_components(openapi_obk, openapi_api)
+    text = schema_report.create_report(component_analysis)
     print(text)
 
 

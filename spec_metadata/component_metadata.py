@@ -2,6 +2,8 @@ import copy
 import re
 from typing import Optional
 
+from definitions import ANALYSIS_COMPONENTS
+
 regex_ref = r'^#\/components\/([\w]+)\/([\w]+)'
 
 
@@ -32,8 +34,7 @@ def analyse_components(openapi_spec: dict) -> ComponentMetadata:
     component_metadata = ComponentMetadata()
     if 'components' not in openapi_spec:
         return component_metadata
-    component_type_list = ['schemas', 'responses', 'parameters', 'requestBodies', 'headers']
-    for component_type_name in component_type_list:
+    for component_type_name in ANALYSIS_COMPONENTS:
         if component_type_name in openapi_spec['components']:
             obj_meta = _analyse_component_object(openapi_spec['components'][component_type_name])
             component_metadata.add_component_spec(component_type_name, obj_meta)
