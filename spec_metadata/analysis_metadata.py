@@ -38,7 +38,7 @@ class GenericAnalysis(object):
         return f"{self.name}: '{self.evaluate()}'"
 
 
-def eval_analysis_obj(obj: Optional[GenericAnalysis]):
+def eval_analysis_obj(obj: Optional[GenericAnalysis]) -> bool:
     return obj.evaluate() if obj is not None else True
 
 
@@ -119,6 +119,14 @@ class RequestBodyAnalysis(GenericAnalysis):
         super().__init__(name)
         self.content: dict[str, MediaTypeAnalysis] = {}
 
+    def evaluate(self):
+        if self.is_ok is None:
+            is_content = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.content.values()), True)
+            self.is_ok = super().evaluate() and is_content
+        if self.is_ok is None:
+            raise Exception('Avaliação de Schema não deve ser None')
+        return self.is_ok
+
 
 class ResponsesAnalysis(GenericAnalysis):
     def __init__(self, name: str):
@@ -133,6 +141,15 @@ class ResponseAnalysis(GenericAnalysis):
         self.headers: dict[str, HeaderAnalysis] = {}
         self.content: dict[str, MediaTypeAnalysis] = {}
 
+    def evaluate(self):
+        if self.is_ok is None:
+            is_content = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.content.values()), True)
+            is_headers = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.headers.values()), True)
+            self.is_ok = super().evaluate() and is_content and is_headers
+        if self.is_ok is None:
+            raise Exception('Avaliação de Schema não deve ser None')
+        return self.is_ok
+
 
 class OperationAnalysis(GenericAnalysis):
     def __init__(self, name: str):
@@ -140,6 +157,15 @@ class OperationAnalysis(GenericAnalysis):
         self.parameters: list[ParameterAnalysis] = []
         self.request_body: Optional[RequestBodyAnalysis] = None
         self.responses: list[ResponsesAnalysis] = []
+
+    def evaluate(self):
+        if self.is_ok is None:
+            is_parameters = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.parameters), True)
+            is_responses = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.responses), True)
+            self.is_ok = super().evaluate() and is_parameters and is_responses and eval_analysis_obj(self.request_body)
+        if self.is_ok is None:
+            raise Exception('Avaliação de Schema não deve ser None')
+        return self.is_ok
 
 
 class PathItemAnalysis(GenericAnalysis):
@@ -154,6 +180,18 @@ class PathItemAnalysis(GenericAnalysis):
         self.patch: Optional[OperationAnalysis] = None
         self.trace: Optional[OperationAnalysis] = None
         self.parameters: list[ParameterAnalysis] = []
+
+    def evaluate(self):
+        if self.is_ok is None:
+            is_parameters = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.parameters), True)
+            operations = filter(lambda a: a is not None,
+                                [self.get, self.put, self.post, self.delete, self.options, self.head, self.patch,
+                                 self.trace])
+            is_op = reduce(lambda a, b: a and b, map(lambda a: a.evaluate(), operations), True)
+            self.is_ok = super().evaluate() and is_parameters and is_op
+        if self.is_ok is None:
+            raise Exception('Avaliação de Schema não deve ser None')
+        return self.is_ok
 
 
 class PathAnalysis(GenericAnalysis):
