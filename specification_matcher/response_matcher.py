@@ -6,7 +6,7 @@ from specification_matcher.media_type_matcher import match_media_type
 
 
 def match_response(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
-                   target_spec: dict) -> ResponseAnalysis:
+                   target_spec: dict, fields=None) -> ResponseAnalysis:
     analysis = ResponseAnalysis(spec_name)
 
     add_field_comparison(analysis, 'headers', base_spec, target_spec, lambda a: list(a.keys()))
@@ -17,9 +17,10 @@ def match_response(components: dict[str, ComponentMetadata], spec_name: str, bas
 
     add_field_comparison(analysis, 'content', base_spec, target_spec, lambda a: list(a.keys()))
     if 'content' in base_spec and 'content' in target_spec:
-        for c_name, c_value in base_spec.items():
+        for c_name, c_value in base_spec['content'].items():
             if c_name in target_spec['content']:
                 analysis.content.append(
-                    match_media_type(components, f"cnt[{c_name}]", base_spec, target_spec))
+                    match_media_type(components, f"cnt[{c_name}]", base_spec['content'][c_name],
+                                     target_spec['content'][c_name]))
 
     return analysis

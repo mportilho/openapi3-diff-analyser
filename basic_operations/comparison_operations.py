@@ -8,7 +8,9 @@ def is_equal(obj_a, obj_b):
     if isinstance(obj_a, list):
         if len(obj_a) != len(obj_b):
             return False
-        if set(obj_a) == set(obj_b):
+        elif isinstance(obj_a, dict) and isinstance(obj_b, dict):
+            return set(obj_a.keys()) == set(obj_b.keys())
+        elif set(obj_a) == set(obj_b):
             return True
         else:
             return False
@@ -16,11 +18,12 @@ def is_equal(obj_a, obj_b):
         return obj_a == obj_b
 
 
-def compare_fields(attr_list: list[str], base_spec: dict, target_spec: dict) -> list[FieldMatchingData]:
+def compare_fields(attr_list: list[str], base_spec: dict, target_spec: dict,
+                   value_extractor: Callable[[Any], Any] = lambda a: a) -> list[FieldMatchingData]:
     comparison_list = list()
     for attr_name in base_spec:
         if attr_name in attr_list:
-            result = compare_simple_field(attr_name, base_spec, target_spec)
+            result = compare_simple_field(attr_name, base_spec, target_spec, value_extractor)
             if result is not None:
                 comparison_list.append(result)
     return comparison_list

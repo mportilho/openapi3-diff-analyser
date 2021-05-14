@@ -51,7 +51,7 @@ class ComponentsAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self._components: dict[str, dict[str, GenericAnalysis]] = {}
-        self.components_metadata: dict[str, ComponentMetadata]
+        self.components_metadata: dict[str, ComponentMetadata] = {}
 
     def set_component(self, component_name: str, component_item_name: str, component_item_analysis: GenericAnalysis):
         if component_name not in self._components:
@@ -89,14 +89,6 @@ class SchemaAnalysis(GenericAnalysis):
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')
         return self.is_ok
-
-
-# class SchemaAnalysisResult(object):
-#     def __init__(self):
-#         self.present: list[str] = []
-#         self.absent: list[str] = []
-#         self.extra: list[str] = []
-#         self.results: dict[str, SchemaAnalysis] = {}
 
 
 class ParameterAnalysis(GenericAnalysis):

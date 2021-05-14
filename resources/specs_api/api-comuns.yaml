@@ -6,7 +6,7 @@ servers:
   - url: http://localhost:8080
     description: Generated server url
 paths:
-  /open-banking/discovery/v1/status:
+  /status:
     get:
       tags:
         - Discovery
@@ -40,7 +40,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseStatus'
-  /open-banking/discovery/v1/outages:
+  /outages:
     get:
       tags:
         - Discovery

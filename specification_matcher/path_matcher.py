@@ -7,10 +7,11 @@ from specification_matcher.path_item_matcher import match_path_item
 def match_paths(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
                 target_spec: dict) -> PathsAnalysis:
     analysis = PathsAnalysis(spec_name)
-    analysis.fields = compare_fields(base_spec.keys(), base_spec, target_spec)
+    analysis.fields = compare_fields('paths', base_spec, target_spec, lambda a: list(a.keys()))
 
-    for pi_name in spec_name:
-        if pi_name in target_spec:
+    for pi_name in base_spec['paths']:
+        if pi_name in target_spec['paths']:
             analysis.path_items.append(
-                match_path_item(components, f"ptm[{pi_name}]", base_spec[pi_name], target_spec[pi_name]))
+                match_path_item(components, f"ptm[{pi_name}]", base_spec['paths'][pi_name],
+                                target_spec['paths'][pi_name]))
     return analysis

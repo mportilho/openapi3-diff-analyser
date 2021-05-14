@@ -3,7 +3,7 @@ from definitions import ANALYSIS_HTTP_REQ_METHODS
 from spec_metadata.analysis_metadata import PathItemAnalysis
 from spec_metadata.component_metadata import ComponentMetadata
 from specification_matcher.operation_matcher import match_operation
-from specification_matcher.parameter_matcher import match_parameter
+from specification_matcher.parameter_matcher import match_parameters
 
 
 def match_path_item(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
@@ -24,18 +24,12 @@ def match_path_item(components: dict[str, ComponentMetadata], spec_name: str, ba
 
     analysis = PathItemAnalysis(spec_name)
 
-    for http_method in ANALYSIS_HTTP_REQ_METHODS:
-        if http_method in base_spec:
-            if http_method in target_spec:
-                analysis.operations[http_method] = match_operation(components, f"op[{http_method}]", base_spec,
-                                                                   target_spec)
-            else:
-                add_field_comparison(analysis, http_method, base_spec, target_spec, lambda a: f"Campo '{http_method}'")
+    for http_method in [verb for verb in ANALYSIS_HTTP_REQ_METHODS if verb in base_spec]:
+        if http_method in target_spec:
+            analysis.operations[http_method] = match_operation(components, f"op[{http_method}]", base_spec[http_method],
+                                                               target_spec[http_method])
+        else:
+            add_field_comparison(analysis, http_method, base_spec, target_spec, lambda a: f"Campo '{http_method}'")
 
-    add_field_comparison(analysis, 'parameters', base_spec, target_spec, lambda a: map(lambda l: l['name'], a))
-    if 'parameters' in base_spec and 'parameters' in target_spec:
-        for p_name in map(lambda l: l['name'], base_spec):
-            target_param = next(filter(lambda tp: tp['name'] == p_name, target_spec['parameters']), None)
-            if target_param is not None:
-                match_parameter(components, f"par[{p_name}]", base_spec[p_name], target_spec[p_name])
+    analysis.parameters = match_parameters(components, base_spec, target_spec, analysis)
     return analysis

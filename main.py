@@ -5,6 +5,7 @@ import yaml
 from definitions import ROOT_DIR
 from reporting import schema_report
 from specification_matcher.components_matcher import match_components
+from specification_matcher.path_matcher import match_paths
 
 
 def _load_yaml(openbk_swagger_path: Path):
@@ -21,8 +22,10 @@ def execute_program():
     openapi_api = _load_yaml(Path(ROOT_DIR, "resources", "specs_api", "api-comuns.yaml"))
 
     component_analysis = match_components(openapi_obk, openapi_api)
+    paths_analysis = match_paths(component_analysis.components_metadata, 'paths', openapi_obk, openapi_api)
+
     text = schema_report.create_report(component_analysis)
-    print(text)
+    print(text, paths_analysis)
 
 
 if __name__ == '__main__':
