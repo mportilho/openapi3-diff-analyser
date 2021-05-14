@@ -5,13 +5,14 @@ from spec_metadata.component_metadata import ComponentMetadata
 from specification_matcher import schema_matcher, media_type_matcher
 
 
-def match_parameter(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict, target_spec: dict):
+def match_parameter(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
+                    target_spec: dict) -> ParameterAnalysis:
     analysis = ParameterAnalysis(spec_name)
     analysis.fields = compare_fields(ANALYSIS_PARAMETERS_FIELDS, base_spec, target_spec)
+
+    add_field_comparison(analysis, 'schema', base_spec, target_spec, lambda a: 'Objeto Schema')
     if 'schema' in base_spec and 'schema' in target_spec:
         analysis.schema = schema_matcher.match_schema(components, base_spec['schema'], target_spec['schema'])
-    else:
-        add_field_comparison(analysis, 'schema', base_spec, target_spec, lambda a: 'Objeto Schema')
 
     add_field_comparison(analysis, 'content', base_spec, target_spec, lambda a: list(a.keys()))
     if 'content' in base_spec and 'content' in target_spec:

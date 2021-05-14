@@ -163,14 +163,14 @@ class OperationAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self.parameters: list[ParameterAnalysis] = []
+        self.responses: Optional[ResponsesAnalysis] = None
         self.request_body: Optional[RequestBodyAnalysis] = None
-        self.responses: list[ResponsesAnalysis] = []
 
     def evaluate(self):
         if self.is_ok is None:
             is_parameters = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.parameters), True)
-            is_responses = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.responses), True)
-            self.is_ok = super().evaluate() and is_parameters and is_responses and eval_analysis_obj(self.request_body)
+            self.is_ok = super().evaluate() and is_parameters and eval_analysis_obj(
+                self.responses) and eval_analysis_obj(self.request_body)
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')
         return self.is_ok
@@ -179,30 +179,20 @@ class OperationAnalysis(GenericAnalysis):
 class PathItemAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
-        self.get: Optional[OperationAnalysis] = None
-        self.put: Optional[OperationAnalysis] = None
-        self.post: Optional[OperationAnalysis] = None
-        self.delete: Optional[OperationAnalysis] = None
-        self.options: Optional[OperationAnalysis] = None
-        self.head: Optional[OperationAnalysis] = None
-        self.patch: Optional[OperationAnalysis] = None
-        self.trace: Optional[OperationAnalysis] = None
+        self.operations: dict[str, OperationAnalysis] = {}
         self.parameters: list[ParameterAnalysis] = []
 
     def evaluate(self):
         if self.is_ok is None:
             is_parameters = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.parameters), True)
-            operations = filter(lambda a: a is not None,
-                                [self.get, self.put, self.post, self.delete, self.options, self.head, self.patch,
-                                 self.trace])
-            is_op = reduce(lambda a, b: a and b, map(lambda a: a.evaluate(), operations), True)
+            is_op = reduce(lambda a, b: a and b, map(lambda a: a.evaluate(), self.operations.values()), True)
             self.is_ok = super().evaluate() and is_parameters and is_op
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')
         return self.is_ok
 
 
-class PathAnalysis(GenericAnalysis):
+class PathsAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self.path_items: list[PathItemAnalysis] = []

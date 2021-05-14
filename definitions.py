@@ -6,4 +6,4 @@ ANALYSIS_SCHEMA_FIELDS = ['required', 'type', 'enum', 'format', 'minimum', 'maxi
                           'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties',
                           'maxProperties', 'minItems', 'maxItems', 'default']
 ANALYSIS_PARAMETERS_FIELDS = ['name', 'in', 'required', 'deprecated', 'allowEmptyValue', 'allowReserved']
-ANALYSIS_MEDIA_TYPE_FIELDS = []
+ANALYSIS_HTTP_REQ_METHODS = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']

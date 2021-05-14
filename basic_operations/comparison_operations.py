@@ -4,7 +4,7 @@ from typing import Optional, Callable, Any
 from spec_metadata.analysis_metadata import FieldMatchingData, GenericAnalysis
 
 
-def _is_equal(obj_a, obj_b):
+def is_equal(obj_a, obj_b):
     if isinstance(obj_a, list):
         if len(obj_a) != len(obj_b):
             return False
@@ -33,7 +33,7 @@ def compare_simple_field(field_name, base_spec: dict, target_spec: dict,
         expected = copy.deepcopy(value_extractor(base_spec[field_name]))
         current = copy.deepcopy(value_extractor(target_spec[field_name]))
         result.set_values(expected, current)
-        if _is_equal(expected, current):
+        if is_equal(expected, current):
             result.reason = 'Atributo validado'
             result.is_matching = True
         else:
