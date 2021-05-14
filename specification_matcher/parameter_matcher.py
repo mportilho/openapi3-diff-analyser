@@ -53,5 +53,6 @@ def match_parameter(components: dict[str, ComponentMetadata], spec_name: str, ba
         for c_name, c_value in base_spec.items():
             if c_name in target_spec['content']:
                 analysis.content.append(
-                    media_type_matcher.match_media_type(components, f"cnt[{c_name}]", base_spec, target_spec))
+                    media_type_matcher.match_media_type(components, f"cnt[{c_name}]", base_spec['content'][c_name],
+                                                        target_spec['content'][c_name]))
     return analysis
