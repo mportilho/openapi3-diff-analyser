@@ -69,11 +69,11 @@ class ParameterAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self.schema: Optional[SchemaAnalysis] = None
-        self.content: dict[str, MediaTypeAnalysis] = {}
+        self.content: list[MediaTypeAnalysis] = []
 
     def evaluate(self):
         if self.is_ok is None:
-            is_content = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.content.values()), True)
+            is_content = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.content), True)
             self.is_ok = super().evaluate() and is_content and eval_analysis_obj(self.schema)
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')

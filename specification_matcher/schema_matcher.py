@@ -1,6 +1,7 @@
 import copy
 
-from basic_operations.comparison_operations import compare_fields, compare_simple_field
+from basic_operations.comparison_operations import compare_fields, add_field_comparison
+from definitions import ANALYSIS_SCHEMA_FIELDS
 from spec_metadata.analysis_metadata import SchemaAnalysis, SchemaAnalysisResult
 from spec_metadata.component_metadata import ComponentMetadata
 
@@ -20,27 +21,24 @@ def match_schema_specification(components: dict[str, ComponentMetadata], base_sc
     return result
 
 
-def match_schema(components: dict[str, ComponentMetadata], schema_name: str, base_spec: dict,
+def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
                  target_spec: dict) -> SchemaAnalysis:
     if '$ref' in base_spec or '$ref' in target_spec:
         if '$ref' in base_spec and '$ref' in target_spec:
-            field_matching_data = list()
-            field_matching_data.append(compare_simple_field('$ref', base_spec, target_spec))
-            return SchemaAnalysis(schema_name, field_matching_data)
+            analysis = SchemaAnalysis(spec_name)
+            add_field_comparison(analysis, '$ref', base_spec, target_spec)
+            return analysis
         elif '$ref' in base_spec:
             comp_obj = components['base'].get_component_by_ref(base_spec['$ref'])
-            name = schema_name + f".$ref[{comp_obj.name}]"
+            name = spec_name + f".$ref[{comp_obj.name}]"
             return match_schema(components, name, comp_obj.get_spec(), target_spec)
         elif '$ref' in target_spec:
             comp_obj = components['target'].get_component_by_ref(target_spec['$ref'])
-            name = schema_name + f".$ref[{comp_obj.name}]"
+            name = spec_name + f".$ref[{comp_obj.name}]"
             return match_schema(components, name, base_spec, comp_obj.get_spec())
 
-    analysis = SchemaAnalysis(schema_name)
-    field_list = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',
-                  'exclusiveMaximum', 'minLength', 'maxLength', 'pattern', 'minProperties',
-                  'maxProperties', 'minItems', 'maxItems', 'default']
-    analysis.fields = compare_fields(field_list, base_spec, target_spec)
+    analysis = SchemaAnalysis(spec_name)
+    analysis.fields = compare_fields(ANALYSIS_SCHEMA_FIELDS, base_spec, target_spec)
 
     base_properties = _compose_properties(components['base'], base_spec)
     target_properties = _compose_properties(components['target'], target_spec)
@@ -48,27 +46,20 @@ def match_schema(components: dict[str, ComponentMetadata], schema_name: str, bas
         base_spec['properties'] = base_properties
     if target_properties:
         target_spec['properties'] = target_properties
-    prop_matching_data = compare_simple_field('properties', base_spec, target_spec, lambda field_name, spec: list(
-        spec[field_name].keys()))
-    if prop_matching_data is not None:
-        analysis.fields.append(prop_matching_data)
+    add_field_comparison(analysis, 'properties', base_spec, target_spec, lambda a: list(a.keys()))
 
     if 'items' in base_spec and 'items' in target_spec:
-        analysis.items = match_schema(components, schema_name + '.item', base_spec['items'], target_spec['items'])
+        analysis.items = match_schema(components, spec_name + '.item', base_spec['items'], target_spec['items'])
     else:
-        item_comp = compare_simple_field('items', base_spec, target_spec, lambda a, b: 'Objeto "items"')
-        if item_comp is not None:
-            analysis.fields.append(item_comp)
+        add_field_comparison(analysis, 'items', base_spec, target_spec, lambda a: 'Objeto "items"')
 
-    prop_analysis_list = list()
-    if 'properties' in base_spec:
-        for prop_name, prop in base_spec['properties'].items():
-            if 'properties' in target_spec and prop_name in target_spec['properties']:
-                name = schema_name + f".p[{prop['$$_NAME'] if '$$_NAME' in prop else prop_name}]"
-                prop_analysis = match_schema(components, name, base_spec['properties'][prop_name],
-                                             target_spec['properties'][prop_name])
-                prop_analysis_list.append(prop_analysis)
-    analysis.properties = prop_analysis_list
+    if 'properties' in base_spec and 'properties' in target_spec:
+        for p_name, prop in base_spec['properties'].items():
+            if p_name in target_spec['properties']:
+                name = spec_name + f".p[{prop['$$_NAME'] if '$$_NAME' in prop else p_name}]"
+                prop_analysis = match_schema(components, name, base_spec['properties'][p_name],
+                                             target_spec['properties'][p_name])
+                analysis.properties.append(prop_analysis)
     analysis.evaluate()
     return analysis
 
