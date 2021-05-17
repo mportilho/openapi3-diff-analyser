@@ -36,7 +36,7 @@ def compare_simple_field(field_name, base_spec: dict, target_spec: dict,
         expected = copy.deepcopy(value_extractor(base_spec[field_name]))
         current = copy.deepcopy(value_extractor(target_spec[field_name]))
         if is_equal(expected, current):
-            result.reason = 'Atributo validado'
+            result.reason = 'Atributo validado.'
             result.set_values(expected, current)
             result.is_matching = True
         else:
@@ -46,16 +46,16 @@ def compare_simple_field(field_name, base_spec: dict, target_spec: dict,
                 expected = f"{'Número' if isinstance(expected, int) else 'Texto'}: {expected}"
                 current = f"{'Número' if isinstance(current, int) else 'Texto'}: {current}"
             result.set_values(expected, current)
-            result.reason = f'Atributo possui valor diferente do esperado'
+            result.reason = f'Atributo possui valor diferente do esperado.'
             result.is_matching = False
     elif field_name in base_spec:
         expected = copy.deepcopy(value_extractor(base_spec[field_name]))
-        result.reason = 'Atributo esperado não encontrado'
+        result.reason = 'Atributo esperado não encontrado.'
         result.is_matching = False
         result.set_values(expected, None)
     elif field_name in target_spec:
         current = copy.deepcopy(value_extractor(target_spec[field_name]))
-        result.reason = 'Atributo não está definido na especificação'
+        result.reason = 'Atributo não está definido na especificação.'
         result.is_matching = False
         result.set_values(None, current)
     else:

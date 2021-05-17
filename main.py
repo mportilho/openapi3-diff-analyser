@@ -34,7 +34,10 @@ def execute_program():
     error_paths_text = '\n'.join(text_path.error_report)
     error_final = error_paths_text + '\n\n' + error_comps_text
 
-    print(final, error_final)
+    with open(Path(ROOT_DIR, 'target', 'complete_report.md'), 'w', encoding='utf-8') as file:
+        file.write(final)
+    with open(Path(ROOT_DIR, 'target', 'error_report.md'), 'w', encoding='utf-8') as file:
+        file.write(error_final)
 
 
 if __name__ == '__main__':

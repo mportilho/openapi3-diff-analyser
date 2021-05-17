@@ -1,5 +1,7 @@
+from pathlib import Path
 from typing import cast, Optional
 
+from definitions import ROOT_DIR
 from spec_metadata.analysis_metadata import FieldMatchingData, SchemaAnalysis, ComponentsAnalysis, PathsAnalysis, \
     ParameterAnalysis, MediaTypeAnalysis, OperationAnalysis, ResponseAnalysis, HeaderAnalysis, ResponsesAnalysis, \
     RequestBodyAnalysis
@@ -67,7 +69,11 @@ def _create_schema_report(indent: int, schema: SchemaAnalysis, is_root=True, pre
 
 def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
     content = Reporting()
-    content.all(f"#### Schemas Presentes\n")
+
+    with open(Path(ROOT_DIR, 'resources', 'schema_description.txt'), 'r', encoding='utf-8') as file:
+        content.all(file.read())
+
+    content.all(f"{_indent(indent)} Schemas Presentes\n")
     if comp_analysis.get_schemas():
         presence = set(comp_analysis.get_field('schemas').get_expected_value()).intersection(
             comp_analysis.get_field('schemas').get_current_value())
@@ -77,7 +83,7 @@ def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
     else:
         content.all('Nenhum schema encontrado\n')
 
-    content.all(f"#### Schemas Ausentes\n")
+    content.all(f"\n{_indent(indent)} Schemas Ausentes\n")
     if comp_analysis.get_schemas():
         presence = set(comp_analysis.get_field('schemas').get_expected_value()).difference(
             comp_analysis.get_field('schemas').get_current_value())
@@ -87,7 +93,7 @@ def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
     else:
         content.all('Nenhum schema encontrado\n')
 
-    content.all(f"#### Schemas Extras Presentes\n")
+    content.all(f"\n{_indent(indent)} Schemas Extras Presentes\n")
     if comp_analysis.get_schemas():
         presence = set(comp_analysis.get_field('schemas').get_current_value()).difference(
             comp_analysis.get_field('schemas').get_expected_value())
@@ -193,7 +199,6 @@ def create_response_list_report(indent: int, responses: list[ResponseAnalysis]):
 
 def create_responses_obj_report(indent: int, responses: Optional[ResponsesAnalysis]):
     content = Reporting()
-
     if responses:
         resp_param = []
         if responses.default is not None:
@@ -288,7 +293,8 @@ def create_component_report(component_analysis: ComponentsAnalysis) -> Reporting
     indentation += 1
     for comp_name, comp in component_analysis.components.items():
         if 'schemas' == comp_name:
-            s_report = _prepare_schema_report(indentation, component_analysis)
+            content.all(f"{_indent(indentation)} Schemas\n")
+            s_report = _prepare_schema_report(indentation + 1, component_analysis)
             content.report.extend(s_report.report)
             content.error_report.extend(s_report.error_report)
 

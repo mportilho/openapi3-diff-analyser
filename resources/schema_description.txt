@@ -1,0 +1,5 @@
+Análise dos objetos *Schema* da especificação *OpenAPI* 3 com base na documentação do *Open Banking Brasil*.
+
+Neste item, os *Schemas* definidos na documentação original serão comparados com a especificação da API alvo. Somente os *Schemas* originais presentes na especificação alvo serão analisados em detalhes. *Schemas* ausentes são considerados como erro, pois devem existir para estar em conformidade com a especificação do *Open Banking* e *Schemas* extras à referida especificação serão apenas mencionados no relatório.
+
+Em complemento, serão exibidos apenas os Schemas originais presentes que apresentarem inconformidades, ocultando os demais corretos.
