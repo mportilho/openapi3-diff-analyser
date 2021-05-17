@@ -29,7 +29,7 @@ def create_field_report(fields: list[FieldMatchingData]) -> Reporting:
         c_list: list[str] = [f"- Campo: **`{field.field_name}`**",
                              f"- Estado: {'**correto**' if field.is_matching else '**incorreto**'}",
                              f"- Razão: {field.reason}", f"- Dados Esperados: `{field.get_expected_value()}`",
-                             f"- Dados Encontrados: `{field.get_current_value()}`\n&nbsp;\n"]
+                             f"- Dados Encontrados: `{field.get_current_value()}`  \n&nbsp;\n"]
         content.report.extend(c_list)
         if not field.is_matching:
             content.error_report.extend(c_list)
