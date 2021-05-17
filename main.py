@@ -17,12 +17,12 @@ def _load_yaml(openbk_swagger_path: Path):
 
 
 def execute_program():
-    openapi_obk = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_common_apis.yaml"))
+    openapi_obk = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis.yaml"))
     openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
     openapi_api = _load_yaml(Path(ROOT_DIR, "resources", "specs_api", "api-comuns.yaml"))
 
-    component_analysis = match_components(openapi_obk, openapi_api)
-    paths_analysis = match_paths(component_analysis.components_metadata, 'paths', openapi_obk, openapi_api)
+    component_analysis = match_components(openapi_obk, openapi_obk_control)
+    paths_analysis = match_paths(component_analysis.components_metadata, 'paths', openapi_obk, openapi_obk_control)
 
     text = schema_report.create_report(component_analysis)
     print(text, paths_analysis)
