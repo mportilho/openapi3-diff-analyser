@@ -25,11 +25,10 @@ def match_path_item(components: dict[str, ComponentMetadata], spec_name: str, ba
     analysis = PathItemAnalysis(spec_name)
 
     for http_method in [verb for verb in ANALYSIS_HTTP_REQ_METHODS if verb in base_spec]:
+        add_field_comparison(analysis, http_method, base_spec, target_spec, lambda a: f"Operation '{http_method}'")
         if http_method in target_spec:
             analysis.operations[http_method] = match_operation(components, http_method, base_spec[http_method],
                                                                target_spec[http_method])
-        else:
-            add_field_comparison(analysis, http_method, base_spec, target_spec, lambda a: f"Campo '{http_method}'")
 
     analysis.parameters = match_parameters(components, base_spec, target_spec, analysis)
     return analysis
