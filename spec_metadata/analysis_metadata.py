@@ -37,8 +37,11 @@ class GenericAnalysis(object):
     def get_field(self, name: str) -> Optional[FieldMatchingData]:
         return next(filter(lambda a: a.field_name == name, self.fields), None)
 
-    def evaluate(self):
+    def evaluate_fields(self):
         return reduce(lambda a, b: a and b, map(lambda a: a.is_matching, self.fields), True)
+
+    def evaluate(self):
+        return self.evaluate_fields()
 
     def __str__(self):
         return f"{self.name}: '{self.evaluate()}'"
@@ -51,16 +54,16 @@ def eval_analysis_obj(obj: Optional[GenericAnalysis]) -> bool:
 class ComponentsAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
-        self._components: dict[str, dict[str, GenericAnalysis]] = {}
+        self.components: dict[str, dict[str, GenericAnalysis]] = {}
         self.components_metadata: dict[str, ComponentMetadata] = {}
 
     def set_component(self, component_name: str, component_item_name: str, component_item_analysis: GenericAnalysis):
-        if component_name not in self._components:
-            self._components[component_name] = {}
-        self._components[component_name][component_item_name] = component_item_analysis
+        if component_name not in self.components:
+            self.components[component_name] = {}
+        self.components[component_name][component_item_name] = component_item_analysis
 
     def get_component(self, component_name: str) -> dict[str, GenericAnalysis]:
-        return self._components[component_name] if component_name in self._components else {}
+        return self.components[component_name] if component_name in self.components else {}
 
     def get_schemas(self) -> dict[str, GenericAnalysis]:
         return self.get_component('schemas')
@@ -80,8 +83,8 @@ class ComponentsAnalysis(GenericAnalysis):
     def evaluate(self):
         is_comp = True
         for n in ANALYSIS_COMPONENTS:
-            if n in self._components:
-                temp = reduce(lambda a, b: a and b, [self._components[n][c].evaluate() for c in self._components[n]])
+            if n in self.components:
+                temp = reduce(lambda a, b: a and b, [self.components[n][c].evaluate() for c in self.components[n]])
                 is_comp = is_comp and temp
                 if not is_comp:
                     break
@@ -165,10 +168,10 @@ class ResponsesAnalysis(GenericAnalysis):
     def __init__(self, name: str):
         super().__init__(name)
         self.default: Optional[ResponseAnalysis] = None
-        self.response: list[ResponseAnalysis] = []
+        self.responses: list[ResponseAnalysis] = []
 
     def evaluate(self):
-        is_response = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.response), True)
+        is_response = reduce(lambda a, b: a and b, map(lambda d: d.evaluate(), self.responses), True)
         self.is_ok = is_response and super().evaluate() and eval_analysis_obj(self.default)
         if self.is_ok is None:
             raise Exception('Avaliação de Schema não deve ser None')

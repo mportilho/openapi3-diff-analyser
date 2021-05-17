@@ -4,6 +4,7 @@ import yaml
 
 from definitions import ROOT_DIR
 from reporting import schema_report
+from reporting.component_report import create_component_report
 from specification_matcher.components_matcher import match_components
 from specification_matcher.path_matcher import match_paths
 
@@ -25,7 +26,8 @@ def execute_program():
     paths_analysis = match_paths(component_analysis.components_metadata, 'paths', openapi_obk, openapi_obk_control)
 
     text = schema_report.create_report(component_analysis)
-    print(text, paths_analysis)
+    create_component_report(component_analysis)
+    # print(text, paths_analysis)
 
 
 if __name__ == '__main__':
