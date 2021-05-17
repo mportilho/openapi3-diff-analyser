@@ -23,6 +23,6 @@ def match_responses(components: dict[str, ComponentMetadata], spec_name: str, ba
         field_comp.reason = 'Responses possuem diferentes http status code'
     for http_code in [code for code in base_codes if code in target_spec]:
         analysis.responses.append(
-            match_response(components, f"rps[{http_code}]", base_spec[http_code], target_spec[http_code]))
+            match_response(components, http_code, base_spec[http_code], target_spec[http_code]))
     analysis.fields.append(field_comp)
     return analysis

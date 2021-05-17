@@ -9,6 +9,5 @@ def match_header(components: dict[str, ComponentMetadata], spec_name: str, base_
     analysis = HeaderAnalysis(spec_name)
     add_field_comparison(analysis, 'schema', base_spec, target_spec, lambda a: 'Objeto Schema')
     if 'schema' in base_spec and 'schema' in target_spec:
-        analysis.schema = schema_matcher.match_schema(components, f"scm[{spec_name}]", base_spec['schema'],
-                                                      target_spec['schema'])
+        analysis.schema = schema_matcher.match_schema(components, spec_name, base_spec['schema'], target_spec['schema'])
     return analysis

@@ -14,11 +14,10 @@ def match_operation(components: dict[str, ComponentMetadata], spec_name: str, ba
 
     add_field_comparison(analysis, 'requestBody', base_spec, target_spec, lambda a: 'Campo "requestBody"')
     if 'requestBody' in base_spec and 'requestBody' in target_spec:
-        analysis.request_body = match_request_body(components, f"rb[{spec_name}]", base_spec['requestBody'],
+        analysis.request_body = match_request_body(components, spec_name, base_spec['requestBody'],
                                                    target_spec['requestBody'])
 
     add_field_comparison(analysis, 'responses', base_spec, target_spec, lambda a: list(a.keys()))
     if 'responses' in base_spec and 'responses' in target_spec:
-        analysis.responses = match_responses(components, f"rps[{spec_name}]", base_spec['responses'],
-                                             target_spec['responses'])
+        analysis.responses = match_responses(components, spec_name, base_spec['responses'], target_spec['responses'])
     return analysis

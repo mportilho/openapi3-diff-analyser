@@ -26,7 +26,7 @@ def match_path_item(components: dict[str, ComponentMetadata], spec_name: str, ba
 
     for http_method in [verb for verb in ANALYSIS_HTTP_REQ_METHODS if verb in base_spec]:
         if http_method in target_spec:
-            analysis.operations[http_method] = match_operation(components, f"op[{http_method}]", base_spec[http_method],
+            analysis.operations[http_method] = match_operation(components, http_method, base_spec[http_method],
                                                                target_spec[http_method])
         else:
             add_field_comparison(analysis, http_method, base_spec, target_spec, lambda a: f"Campo '{http_method}'")

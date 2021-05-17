@@ -14,7 +14,7 @@ def match_response(components: dict[str, ComponentMetadata], spec_name: str, bas
         for c_name, c_value in base_spec.items():
             if c_name in target_spec['headers']:
                 analysis.headers.append(
-                    match_header(components, f"hdr[{c_name}]", base_spec['headers'][c_name],
+                    match_header(components, c_name, base_spec['headers'][c_name],
                                  target_spec['headers'][c_name]))
 
     add_field_comparison(analysis, 'content', base_spec, target_spec, lambda a: list(a.keys()))
@@ -22,7 +22,6 @@ def match_response(components: dict[str, ComponentMetadata], spec_name: str, bas
         for c_name, c_value in base_spec['content'].items():
             if c_name in target_spec['content']:
                 analysis.content.append(
-                    match_media_type(components, f"cnt[{c_name}]", base_spec['content'][c_name],
-                                     target_spec['content'][c_name]))
+                    match_media_type(components, c_name, base_spec['content'][c_name], target_spec['content'][c_name]))
 
     return analysis

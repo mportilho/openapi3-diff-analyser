@@ -120,7 +120,8 @@ def create_media_types_analysis(indent: int, media_types_analysis: list[MediaTyp
         s_content = _create_schema_report(indent, media_type.schema)
         content.report.extend(s_content.report)
         _add_error_report(header, s_content.error_report, content)
-    print()
+    else:
+        content.all('Nenhum objeto "MediaType" encontrado')
 
     return content
 
@@ -143,6 +144,8 @@ def create_parameters_report(indent: int, parameters_analysis: list[ParameterAna
         s_content = _create_schema_report(indent, param.schema)
         content.report.extend(s_content.report)
         _add_error_report(header, s_content.error_report, content)
+    else:
+        content.all('Nenhum objeto "Parameter" encontrado')
 
     return content
 
@@ -165,6 +168,8 @@ def create_headers_analysis(indent: int, headers: list[HeaderAnalysis]):
         s_content = _create_schema_report(indent, header.schema)
         content.report.extend(s_content.report)
         _add_error_report(header_title, s_content.error_report, content)
+    else:
+        content.all('Nenhum objeto "Header" encontrado')
     return content
 
 
@@ -186,6 +191,8 @@ def create_response_list_report(indent: int, responses: list[ResponseAnalysis]):
         h_content = create_headers_analysis(indent, response.headers)
         content.report.extend(h_content.report)
         _add_error_report(header, h_content.error_report, content)
+    else:
+        content.all('Nenhum objeto "Response" encontrado')
 
     return content
 
@@ -204,15 +211,14 @@ def create_responses_obj_report(indent: int, responses: Optional[ResponsesAnalys
             p_content = create_response_list_report(indent, resp_param)
             content.report.extend(p_content.report)
             _add_error_report('', p_content.error_report, content)
-        print()
     return content
 
 
 def create_request_body_report(indent: int, request_body: Optional[RequestBodyAnalysis]):
     indent += 1
     content = Reporting()
+    header = f"{_indent(indent)} Request Body {request_body.name}\n"
     if request_body is not None:
-        header = f"{_indent(indent)} Request Body {request_body.name}\n"
         content.report.append(header)
 
         f_content = create_field_report(request_body.fields)
@@ -222,6 +228,8 @@ def create_request_body_report(indent: int, request_body: Optional[RequestBodyAn
         mt_content = create_media_types_analysis(indent, request_body.content)
         content.report.extend(mt_content.report)
         _add_error_report(header, mt_content.error_report, content)
+    else:
+        content.all('Objeto "RequestBody" não encontrado')
 
     return content
 
@@ -248,6 +256,8 @@ def create_operations_report(indent, operations: dict[str, OperationAnalysis]):
         rb_content = create_request_body_report(indent, operation.request_body)
         content.report.extend(rb_content.report)
         _add_error_report(header, rb_content.error_report, content)
+    else:
+        content.all('Nenhum objeto "Operation" encontrado')
 
     return content
 
@@ -271,6 +281,8 @@ def create_paths_report(paths_analysis: PathsAnalysis) -> str:
         o_content = create_operations_report(indent, path_item.operations)
         content.report.extend(o_content.report)
         _add_error_report(header, o_content.error_report, content)
+    else:
+        content.all('Nenhum objeto "Paths" encontrado')
 
     return '\n'.join(content.error_report)
 

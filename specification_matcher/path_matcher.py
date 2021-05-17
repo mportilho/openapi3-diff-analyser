@@ -12,6 +12,5 @@ def match_paths(components: dict[str, ComponentMetadata], spec_name: str, base_s
     for pi_name in base_spec['paths']:
         if pi_name in target_spec['paths']:
             analysis.path_items.append(
-                match_path_item(components, f"ptm[{pi_name}]", base_spec['paths'][pi_name],
-                                target_spec['paths'][pi_name]))
+                match_path_item(components, pi_name, base_spec['paths'][pi_name], target_spec['paths'][pi_name]))
     return analysis

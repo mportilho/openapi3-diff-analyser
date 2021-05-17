@@ -45,14 +45,13 @@ def match_parameter(components: dict[str, ComponentMetadata], spec_name: str, ba
 
     add_field_comparison(analysis, 'schema', base_spec, target_spec, lambda a: 'Objeto Schema')
     if 'schema' in base_spec and 'schema' in target_spec:
-        analysis.schema = schema_matcher.match_schema(components, f"scm[{spec_name}]", base_spec['schema'],
-                                                      target_spec['schema'])
+        analysis.schema = schema_matcher.match_schema(components, spec_name, base_spec['schema'], target_spec['schema'])
 
     add_field_comparison(analysis, 'content', base_spec, target_spec, lambda a: list(a.keys()))
     if 'content' in base_spec and 'content' in target_spec:
         for c_name, c_value in base_spec.items():
             if c_name in target_spec['content']:
                 analysis.content.append(
-                    media_type_matcher.match_media_type(components, f"cnt[{c_name}]", base_spec['content'][c_name],
+                    media_type_matcher.match_media_type(components, c_name, base_spec['content'][c_name],
                                                         target_spec['content'][c_name]))
     return analysis
