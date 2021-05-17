@@ -30,7 +30,7 @@ def match_parameters(components: dict[str, ComponentMetadata], base_spec: dict,
 
         for p_name in base_params:
             if p_name in target_params:
-                params_analysis_map.append(match_parameter(components, f"par[{p_name}]", base_params[p_name],
+                params_analysis_map.append(match_parameter(components, p_name, base_params[p_name],
                                                            target_params[p_name]))
     if analysis is not None and (base_params or target_params):
         add_field_comparison(analysis, 'parameters', {'parameters': base_params}, {'parameters': target_params},
