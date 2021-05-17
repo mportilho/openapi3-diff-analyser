@@ -28,7 +28,13 @@ def execute_program():
     text_path = create_paths_report(paths_analysis)
     comps_text = '\n'.join(text.report)
     paths_text = '\n'.join(text_path.report)
-    print(comps_text, paths_text)
+    final = paths_text + '\n\n' + comps_text
+
+    error_comps_text = '\n'.join(text.error_report)
+    error_paths_text = '\n'.join(text_path.error_report)
+    error_final = error_paths_text + '\n\n' + error_comps_text
+
+    print(final, error_final)
 
 
 if __name__ == '__main__':

@@ -274,6 +274,9 @@ def create_paths_report(paths_analysis: PathsAnalysis) -> Reporting:
     if len(paths_analysis.path_items) == 0:
         content.all('Nenhum objeto "PathItem" encontrado')
 
+    if len(content.error_report) == 1:
+        content.error_report.append('Nenhuma inconsistência encontrada')
+
     return content
 
 
