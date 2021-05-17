@@ -26,7 +26,9 @@ def execute_program():
 
     text = create_component_report(component_analysis)
     text_path = create_paths_report(paths_analysis)
-    print(text, text_path)
+    comps_text = '\n'.join(text.report)
+    paths_text = '\n'.join(text_path.report)
+    print(comps_text, paths_text)
 
 
 if __name__ == '__main__':

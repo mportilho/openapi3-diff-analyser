@@ -27,11 +27,10 @@ def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_
 
     base_properties = _compose_properties(components['base'], base_spec)
     target_properties = _compose_properties(components['target'], target_spec)
-    add_field_comparison(analysis, 'properties', base_spec, target_spec, lambda a: list(a.keys()))
+    if base_properties or target_properties:
+        add_field_comparison(analysis, 'properties', {'properties': base_properties}, {'properties': target_properties},
+                             lambda a: list(a.keys()))
     add_field_comparison(analysis, 'items', base_spec, target_spec, lambda a: 'Objeto "items"')
-
-    if 'items' in base_spec and 'items' in target_spec:
-        analysis.items = match_schema(components, spec_name + '.item', base_spec['items'], target_spec['items'])
 
     if base_properties and target_properties:
         for p_name, prop in base_properties.items():
@@ -39,6 +38,9 @@ def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_
                 name = spec_name + f".p[{prop['$$_NAME'] if '$$_NAME' in prop else p_name}]"
                 prop_analysis = match_schema(components, name, base_properties[p_name], target_properties[p_name])
                 analysis.properties.append(prop_analysis)
+    if 'items' in base_spec and 'items' in target_spec:
+        analysis.items = match_schema(components, spec_name + '.item', base_spec['items'], target_spec['items'])
+
     return analysis
 
 

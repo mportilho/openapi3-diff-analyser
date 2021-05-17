@@ -16,16 +16,18 @@ class Reporting(object):
 
 
 def _indent(indentation: int):
+    if indentation > 6:
+        indentation = 6
     return str(f"{{:#^{indentation}}}").format('')
 
 
 def create_field_report(fields: list[FieldMatchingData]) -> Reporting:
     content = Reporting()
     for field in fields:
-        c_list: list[str] = [f"**Campo {field.field_name}**\n",
+        c_list: list[str] = [f"- Campo: **`{field.field_name}`**",
                              f"- Estado: {'**correto**' if field.is_matching else '**incorreto**'}",
-                             f"- Razão: {field.reason}", f"- Dados Esperados: `{field.get_expected_value()}",
-                             f"- Dados Encontrados: `{field.get_current_value()}"]
+                             f"- Razão: {field.reason}", f"- Dados Esperados: `{field.get_expected_value()}`",
+                             f"- Dados Encontrados: `{field.get_current_value()}`\n&nbsp;\n"]
         content.report.extend(c_list)
         if not field.is_matching:
             content.error_report.extend(c_list)
@@ -117,7 +119,7 @@ def create_media_types_analysis(indent: int, media_types_analysis: list[MediaTyp
         content.report.extend(f_content.report)
         _add_error_report(header, f_content.error_report, content)
 
-        s_content = _create_schema_report(indent, media_type.schema)
+        s_content = _create_schema_report(indent + 1, media_type.schema)
         content.report.extend(s_content.report)
         _add_error_report(header, s_content.error_report, content)
 
@@ -139,7 +141,7 @@ def create_parameters_report(indent: int, parameters_analysis: list[ParameterAna
         content.report.extend(p_content.report)
         _add_error_report(header, p_content.error_report, content)
 
-        s_content = _create_schema_report(indent, param.schema)
+        s_content = _create_schema_report(indent + 1, param.schema)
         content.report.extend(s_content.report)
         _add_error_report(header, s_content.error_report, content)
 
@@ -161,7 +163,7 @@ def create_headers_analysis(indent: int, headers: list[HeaderAnalysis]):
         content.report.extend(mt_content.report)
         _add_error_report(header_title, mt_content.error_report, content)
 
-        s_content = _create_schema_report(indent, header.schema)
+        s_content = _create_schema_report(indent + 1, header.schema)
         content.report.extend(s_content.report)
         _add_error_report(header_title, s_content.error_report, content)
     return content
@@ -190,7 +192,6 @@ def create_response_list_report(indent: int, responses: list[ResponseAnalysis]):
 
 
 def create_responses_obj_report(indent: int, responses: Optional[ResponsesAnalysis]):
-    indent += 1
     content = Reporting()
 
     if responses:
@@ -225,7 +226,6 @@ def create_request_body_report(indent: int, request_body: Optional[RequestBodyAn
 
 
 def create_operations_report(indent, operations: dict[str, OperationAnalysis]):
-    indent += 1
     content = Reporting()
     for operation in operations.values():
         header = f"{_indent(indent)} Operation {operation.name}\n"
@@ -255,18 +255,20 @@ def create_paths_report(paths_analysis: PathsAnalysis) -> Reporting:
     content = Reporting()
     content.all(f"{_indent(indent)} Paths\n")
 
+    indent += 1
     for path_item in paths_analysis.path_items:
-        header = f"""Path *{path_item.name}*\n"""
+        header = f"""{_indent(indent)} Path *{path_item.name}*\n"""
+        content.report.append(header)
 
         f_content = create_field_report(path_item.fields)
         content.report.extend(f_content.report)
         _add_error_report(header, f_content.error_report, content)
 
-        p_content = create_parameters_report(indent, path_item.parameters)
+        p_content = create_parameters_report(indent + 1, path_item.parameters)
         content.report.extend(p_content.report)
         _add_error_report(header, p_content.error_report, content)
 
-        o_content = create_operations_report(indent, path_item.operations)
+        o_content = create_operations_report(indent + 1, path_item.operations)
         content.report.extend(o_content.report)
         _add_error_report(header, o_content.error_report, content)
     if len(paths_analysis.path_items) == 0:
