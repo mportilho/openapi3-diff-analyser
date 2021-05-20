@@ -1,4 +1,4 @@
-openapi: 3.0.0
+﻿openapi: 3.0.0
 info:
   title: API's OpenData do Open Banking Brasil
   description: As API's descritas neste documento são referentes as API's da fase OpenData do Open Banking Brasil.
@@ -99,7 +99,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponsePersonalCreditCard'
+                $ref: '#/components/schemas/PersonalCreditCardResponse'
   /business-credit-cards:
     get:
       tags:
@@ -116,7 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseBusinessCreditCard'
+                $ref: '#/components/schemas/BusinessCreditCardResponse'
   /personal-financings:
     get:
       tags:
@@ -221,7 +221,7 @@ paths:
                 $ref: '#/components/schemas/ResponseBusinessUnarrangedAccountOverdraft'
 components:
   schemas:
-    AccountsTermsConditions:
+    AccountsTermsConditions: # OK
       type: object
       description: Objeto que reúne informações relativas a Termos e Condições para as modalidades tratadas
       required:
@@ -258,9 +258,9 @@ components:
             brand:
               $ref: '#/components/schemas/PersonalAccountBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     PersonalAccountBrand:
       type: object
       required:
@@ -293,7 +293,7 @@ components:
           example: 'Empresa A1'
         cnpjNumber:
           type: string
-          pattern: '^(\d{14})$|^NA$'
+          pattern: '^(\d{14})$'
           description: CNPJ
           maxLength: 14
           example: "50685362000135"
@@ -304,6 +304,7 @@ components:
           description: |
             URL do link que conterá a lista complementar com os nomes e CNPJs agrupados sob o mesmo cnpjNumber. Os contidos nessa lista possuem as mesmas características para produtos e serviços. Endereço eletrônico de acesso ao canal. Será obrigatoriamente preenchido se houver lista complementar com os nomes e CNPJs a ser disponibilizada.
             Restrição: Será obrigatorimente preenchido se houver lista complementar com os nomes e CNPJs a ser disponibilizada
+          example: 'https://empresadaorganizacaoa.com/complementarylist'
         personalAccounts:
           type: array
           items:
@@ -311,12 +312,10 @@ components:
           description: Lista de tipos de conta
           minItems: 1
           maxItems: 3
-    PersonalAccount:
+    PersonalAccount: # OK
       type: object
       required:
         - type
-        - fees
-        - serviceBundles
         - openingClosingChannels
         - transactionMethods
         - termsConditions
@@ -345,7 +344,17 @@ components:
         openingClosingChannels:
           type: array
           items:
-            $ref: '#/components/schemas/OpeningClosingChannels'
+            type: string
+            enum:
+              - DEPENDENCIAS_PROPRIAS
+              - CORRESPONDENTES_BANCARIOS
+              - INTERNET_BANKING
+              - MOBILE_BANKING
+              - CENTRAL_TELEFONICA
+              - CHAT
+              - OUTROS
+            description: Canais disponíveis para abertura e encerramento de contas, p.ex. 'DEPENDENCIAS_PROPRIAS'
+            example: DEPENDENCIAS_PROPRIAS
           minItems: 1
           maxItems: 7
           description: Lista dos canais para aberturas e encerramento
@@ -360,7 +369,14 @@ components:
         transactionMethods:
           type: array
           items:
-            $ref: '#/components/schemas/TransactionMethods'
+            type: string
+            enum:
+              - MOVIMENTACAO_ELETRONICA
+              - MOVIMENTACAO_CHEQUE
+              - MOVIMENTACAO_CARTAO
+              - MOVIMENTACAO_PRESENCIAL
+            description: Lista de formas de movimentação possíveis para a conta
+            example: MOVIMENTACAO_CARTAO
           minItems: 1
           maxItems: 4
           description: Lista de formas de movimentação
@@ -368,12 +384,9 @@ components:
           $ref: '#/components/schemas/AccountsTermsConditions'
         incomeRate:
           $ref: '#/components/schemas/AccountsIncomeRate'
-    AccountFee:
+    AccountFee: # OK
       type: object
       description: Objeto que reúne informações de tarifas de serviços
-      required:
-        - priorityServices
-        - otherServices
       properties:
         priorityServices:
           type: array
@@ -388,7 +401,7 @@ components:
             $ref: '#/components/schemas/AccountOtherService'
           minItems: 1
           description: Lista das Tarifas cobradas sobre outros Serviços, que não prioritários
-    AccountPriorityService:
+    AccountPriorityService: # OK
       type: object
       required:
         - name
@@ -401,7 +414,49 @@ components:
         name:
           $ref: '#/components/schemas/PriorityServiceName'
         code:
-          $ref: '#/components/schemas/AccountPriorityServiceCode'
+          type: string
+          description: 'Lista das Siglas de identificação do Serviço Prioritário, segundo Resolução 3.919 do Bacen.'
+          enum:
+            - CADASTRO
+            - 2_VIA_CARTAO_DEBITO
+            - 2_VIA_CARTAO_POUPANCA
+            - EXCLUSAO_CCF
+            - SUSTACAO_REVOGACAO
+            - FOLHA_CHEQUE
+            - CHEQUE_ADMINISTRATIVO
+            - CHEQUE_VISADO
+            - SAQUE_PESSOAL
+            - SAQUE_TERMINAL
+            - SAQUE_CORRESPONDENTE
+            - DEPOSITO_IDENTIFICADO
+            - EXTRATO_MES_P
+            - EXTRATO_MES_E
+            - EXTRATO_MES_C
+            - EXTRATO_MOVIMENTO_P
+            - EXTRATO_MOVIMENTO_E
+            - EXTRATO_MOVIMENTO_C
+            - MICROFILME
+            - DOC_PESSOAL
+            - DOC_ELETRONICO
+            - DOC_INTERNET
+            - TED_PESSOAL
+            - TED_ELETRONICO
+            - TED_INTERNET
+            - DOC_TED_AGENDADO_P
+            - DOC_TED_AGENDADO_E
+            - DOC_TED_AGENDADO_I
+            - TRANSF_RECURSO_P
+            - TRANSF_RECURSO_E
+            - ORDEM_PAGAMENTO
+            - ANUIDADE_NACIONAL
+            - ANUIDADE_INTERNACIONAL
+            - ANUIDADE_DIFERENCIADA
+            - SAQUE_CARTAO_BRASIL
+            - SAQUE_CARTAO_EXTERIOR
+            - AVALIACAO_EMERGENCIAL_CREDITO
+            - EMISSAO_SEGUNDA_VIA
+            - TARIFA_PAGAMENTO_CONTAS
+            - SMS
         chargingTriggerInfo:
           type: string
           maxLength: 2000
@@ -419,27 +474,6 @@ components:
           $ref: '#/components/schemas/MinimumPrice'
         maximum:
           $ref:  "#/components/schemas/MaximumPrice"
-    OpeningClosingChannels:
-      type: string
-      enum:
-        - DEPENDENCIAS_PROPRIAS
-        - CORRESPONDENTES_BANCARIOS
-        - INTERNET_BANKING
-        - MOBILE_BANKING
-        - CENTRAL_TELEFONICA
-        - CHAT
-        - OUTROS
-      description: Canais disponíveis para abertura e encerramento de contas, p.ex. 'DEPENDENCIAS_PROPRIAS'
-      example: DEPENDENCIAS_PROPRIAS
-    TransactionMethods:
-      type: string
-      enum:
-        - MOVIMENTACAO_ELETRONICA
-        - MOVIMENTACAO_CHEQUE
-        - MOVIMENTACAO_CARTAO
-        - MOVIMENTACAO_PRESENCIAL
-      description: Lista de formas de movimentação possíveis para a conta
-      example: MOVIMENTACAO_CARTAO
     PriorityServiceName:
       type: string
       enum:
@@ -485,7 +519,7 @@ components:
         - SMS
       description: 'Nome dos Serviços prioritários, segundo Resolução 3.919 do Bacen, para pessoa natural.'
       example: TRANSFERENCIA_TED_PESSOAL_OU_PRESENCIAL
-    AccountOtherService:
+    AccountOtherService: # OK
       type: object
       required:
         - name
@@ -523,56 +557,10 @@ components:
           $ref: "#/components/schemas/MinimumPrice"
         maximum:
           $ref: "#/components/schemas/MaximumPrice"
-    AccountPriorityServiceCode:
-      type: string
-      description: 'Lista das Siglas de identificação do Serviço Prioritário, segundo Resolução 3.919 do Bacen.'
-      enum:
-        - CADASTRO
-        - 2_VIA_CARTAO_DEBITO
-        - 2_VIA_CARTAO_POUPANCA
-        - EXCLUSAO_CCF
-        - SUSTACAO_REVOGACAO
-        - FOLHA_CHEQUE
-        - CHEQUE_ADMINISTRATIVO
-        - CHEQUE_VISADO
-        - SAQUE_PESSOAL
-        - SAQUE_TERMINAL
-        - SAQUE_CORRESPONDENTE
-        - DEPOSITO_IDENTIFICADO
-        - EXTRATO_MES_P
-        - EXTRATO_MES_E
-        - EXTRATO_MES_C
-        - EXTRATO_MOVIMENTO_P
-        - EXTRATO_MOVIMENTO_E
-        - EXTRATO_MOVIMENTO_C
-        - MICROFILME
-        - DOC_PESSOAL
-        - DOC_ELETRONICO
-        - DOC_INTERNET
-        - TED_PESSOAL
-        - TED_ELETRONICO
-        - TED_INTERNET
-        - DOC_TED_AGENDADO_P
-        - DOC_TED_AGENDADO_E
-        - DOC_TED_AGENDADO_I
-        - TRANSF_RECURSO_P
-        - TRANSF_RECURSO_E
-        - ORDEM_PAGAMENTO
-        - ANUIDADE_NACIONAL
-        - ANUIDADE_INTERNACIONAL
-        - ANUIDADE_DIFERENCIADA
-        - SAQUE_CARTAO_BRASIL
-        - SAQUE_CARTAO_EXTERIOR
-        - AVALIACAO_EMERGENCIAL_CREDITO
-        - EMISSAO_SEGUNDA_VIA
-        - TARIFA_PAGAMENTO_CONTAS
-        - SMS
-    ServiceBundle:
+    ServiceBundle: # OK
       type: object
       required:
         - name
-        - services
-        - prices
         - minimum
         - maximum
       properties:
@@ -599,7 +587,7 @@ components:
           $ref:  "#/components/schemas/MinimumPrice"
         maximum:
           $ref:  "#/components/schemas/MaximumPrice"
-    ServiceBundleServiceDetail:
+    ServiceBundleServiceDetail: # OK
       type: object
       required:
         - code
@@ -636,15 +624,13 @@ components:
           description: |
             Segundo Resolução  4196, BCB, de 2013: Quantidade de eventos previstos no Pacote de Serviços com isenção de Tarifa.p.ex.'1'  No caso de quantidade ilimitada, reportar 999999
           example: '1'
-    AccountsIncomeRate:
+    AccountsIncomeRate: # OK
       type: object
       properties:
         savingAccount:
           type: string
           maxLength: 2000
           pattern: \w*\W*
-          minItems: 1
-          maxItems: 1
           description: |
             Descrição da Remuneração especificamente para Conta de Poupança. Deve ser preenchido com a determinação legal vigente.
             Restrição: De preenchimento obrigatório para CONTA_POUPANCA.
@@ -653,8 +639,6 @@ components:
           type: string
           maxLength: 2000
           pattern: \w*\W*
-          minItems: 1
-          maxItems: 1
           description: Campo Livre. Deve explicitar o Percentual em favor do titular da conta de pagamento pré-paga.
           example: '40% Rendimento a.m.'
     ResponseBusinessAccounts:
@@ -672,9 +656,9 @@ components:
             brand:
               $ref: '#/components/schemas/BusinessAccountsBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     BusinessAccountsBrand:
       type: object
       required:
@@ -778,7 +762,6 @@ components:
         name:
           type: string
           maxLength: 250
-          pattern: \w*\W*
           description: 'Nome do Serviço que incide sobre tipo de conta selecionado para pessoa jurídica(Campo Livre)'
           example: Evento personalizado
         code:
@@ -818,9 +801,9 @@ components:
             brand:
               $ref: '#/components/schemas/PersonalLoanBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     PersonalLoanBrand:
       type: object
       required:
@@ -882,9 +865,9 @@ components:
             brand:
               $ref: '#/components/schemas/BusinessLoanBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     BusinessLoanBrand:
       type: object
       required:
@@ -1382,7 +1365,7 @@ components:
           pattern: \w*\W*
           description: Campo Texto para descrever outras operações de crédito marcadas como 'OUTROS'. Se o campo 'code' vier selecionado com 'OUTROS' é obrigatório o preenchimento do additionalInfo
           example: NA
-    ResponsePersonalCreditCard:
+    PersonalCreditCardResponse:
       type: object
       required:
         - data
@@ -1397,9 +1380,9 @@ components:
             brand:
               $ref: '#/components/schemas/PersonalCreditCardBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     PersonalCreditCardBrand:
       type: object
       required:
@@ -1428,7 +1411,7 @@ components:
           items:
             $ref: '#/components/schemas/PersonalCreditCard'
           minItems: 1
-    ResponseBusinessCreditCard:
+    BusinessCreditCardResponse:
       type: object
       required:
         - data
@@ -1443,9 +1426,9 @@ components:
             brand:
               $ref: '#/components/schemas/BusinessCreditCardBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     BusinessCreditCardBrand:
       type: object
       required:
@@ -1543,9 +1526,9 @@ components:
             brand:
               $ref: '#/components/schemas/PersonalFinancingBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     PersonalFinancingBrand:
       type: object
       required:
@@ -1732,9 +1715,9 @@ components:
             brand:
               $ref: '#/components/schemas/BusinessFinancingBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     BusinessFinancingBrand:
       type: object
       required:
@@ -1834,9 +1817,9 @@ components:
             brand:
               $ref: '#/components/schemas/PersonalInvoiceFinancingsBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     PersonalInvoiceFinancingsBrand:
       type: object
       required:
@@ -2006,9 +1989,9 @@ components:
             brand:
               $ref: '#/components/schemas/BusinessInvoiceFinancingsBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     BusinessInvoiceFinancingsBrand:
       type: object
       required:
@@ -2018,7 +2001,7 @@ components:
         name:
           type: string
           pattern: \w*\W*
-          maxLength: 80
+          maxLength: 30
           description: Nome da marca.
           example: Marca A
         companies:
@@ -2138,9 +2121,9 @@ components:
             brand:
               $ref: '#/components/schemas/BusinessUnarrangedAccountOverdraftBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     BusinessUnarrangedAccountOverdraftBrand:
       type: object
       required:
@@ -2357,9 +2340,9 @@ components:
             brand:
               $ref: '#/components/schemas/PersonalUnarrangedAccountOverdraftBrand'
         links:
-          $ref: '#/components/schemas/LinksPaginated'
+          $ref: '#/components/schemas/Links'
         meta:
-          $ref: '#/components/schemas/MetaPaginated'
+          $ref: '#/components/schemas/Meta'
     PersonalUnarrangedAccountOverdraftBrand:
       type: object
       required:
@@ -2424,7 +2407,7 @@ components:
             $ref: '#/components/schemas/UnarrangedAccountOverdraftService'
           minItems: 1
           description: Lista das Tarifas cobradas sobre Serviços Prioritários
-    Price:
+    Price: # OK
       type: object
       required:
         - interval
@@ -2443,10 +2426,14 @@ components:
             Valor da mediana de cada faixa relativa ao serviço ofertado, informado no período, conforme Res nº 32 BCB, 2020. p.ex. '45.00' (representa um valor monetário. p.ex: 1547368.92. Este valor, considerando que a moeda seja BRL, significa R$ 1.547.368,92. O único separador presente deve ser o '.' (ponto) para indicar a casa decimal. Não deve haver separador de milhar)
           example: '2000.00'
         currency:
-          $ref:  '#/components/schemas/Currency'
+          type: string
+          maxLength: 3
+          x-cds-type: CurrencyString
+          description: 'Moeda referente ao valor mínimo da Tarifa, segundo modelo ISO-4217'
+          example: BRL
         customers:
           $ref: '#/components/schemas/Customer'
-    MonthlyPrice:
+    MonthlyPrice: # OK
       type: object
       required:
         - interval
@@ -2455,7 +2442,7 @@ components:
         - customers
       properties:
         interval:
-          $ref: '#/components/schemas/PriceIntervals'
+          $ref: '#/components/schemas/PriceInterval'
         monthlyFee:
           type: string
           pattern: '^((\d{1,9}\.\d{2}){1}|NA)$'
@@ -2469,7 +2456,7 @@ components:
           $ref:  "#/components/schemas/Currency"
         customers:
           $ref: '#/components/schemas/Customer'
-    MinimumPrice:
+    MinimumPrice: # OK
       type: object
       required:
         - value
@@ -2483,8 +2470,12 @@ components:
           description: Valor mínimo apurado para a tarifa de serviços sobre a base de clientes no mês de referência
           example: '1350.00'
         currency:
-          $ref:  "#/components/schemas/Currency"
-    MaximumPrice:
+          type: string
+          maxLength: 3
+          x-cds-type: CurrencyString
+          description: 'Moeda referente ao valor mínimo da Tarifa, segundo modelo ISO-4217'
+          example: BRL
+    MaximumPrice: # OK
       type: object
       required:
         - value
@@ -2498,8 +2489,12 @@ components:
           description: Valor máximo apurado para a tarifa de serviços sobre a base de clientes no mês de referência
           example: '8800.00'
         currency:
-          $ref:  "#/components/schemas/Currency"
-    Customer:
+          type: string
+          maxLength: 3
+          x-cds-type: CurrencyString
+          description: 'Moeda referente ao valor mínimo da Tarifa, segundo modelo ISO-4217'
+          example: BRL
+    Customer: # OK
       type: object
       required:
         - rate
@@ -2527,7 +2522,6 @@ components:
           $ref:  "#/components/schemas/Currency"
     Currency:
       type: string
-      pattern: '^(\w{3}){1}$'
       maxLength: 3
       x-cds-type: CurrencyString
       description: 'Moeda referente ao valor mínimo da Tarifa, segundo modelo ISO-4217'
@@ -2709,7 +2703,7 @@ components:
           description: CNPJ
           maxLength: 14
           example: "50685362000135"
-    LinksPaginated:
+    Links:
       type: object
       properties:
         self:
@@ -2730,7 +2724,7 @@ components:
           type: string
           description: URL da última página de registros
           example: 'https://api.banco.com.br/open-banking/products-services/v1/<resource>'
-    MetaPaginated:
+    Meta:
       type: object
       properties:
         totalRecords:
