@@ -2,10 +2,8 @@ from pathlib import Path
 
 import yaml
 
+from application.specification_diff import run_diff
 from definitions import ROOT_DIR
-from reporting.component_report import create_component_report, create_paths_report
-from specification_matcher.components_matcher import match_components
-from specification_matcher.path_matcher import match_paths
 
 
 def _load_yaml(openbk_swagger_path: Path):
@@ -16,23 +14,12 @@ def _load_yaml(openbk_swagger_path: Path):
     return yaml_obj
 
 
-def execute_program():
+def run_local_program():
     openapi_obk = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_common_apis.yaml"))
     openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
     openapi_api = _load_yaml(Path(ROOT_DIR, "resources", "specs_api", "api-comuns.yaml"))
 
-    component_analysis = match_components(openapi_obk, openapi_api)
-    paths_analysis = match_paths(component_analysis.components_metadata, 'paths', openapi_obk, openapi_api)
-
-    text = create_component_report(component_analysis)
-    text_path = create_paths_report(paths_analysis)
-    comps_text = '\n'.join(text.report)
-    paths_text = '\n'.join(text_path.report)
-    final = paths_text + '\n\n' + comps_text
-
-    error_comps_text = '\n'.join(text.error_report)
-    error_paths_text = '\n'.join(text_path.error_report)
-    error_final = error_paths_text + '\n\n' + error_comps_text
+    error_final, final = run_diff(openapi_obk, openapi_api)
 
     with open(Path(ROOT_DIR, 'target', 'complete_report.md'), 'w', encoding='utf-8') as file:
         file.write(final)
@@ -41,4 +28,4 @@ def execute_program():
 
 
 if __name__ == '__main__':
-    execute_program()
+    run_local_program()
