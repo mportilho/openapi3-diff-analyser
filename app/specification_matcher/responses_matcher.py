@@ -1,7 +1,7 @@
-from basic_operations import comparison_operations as comp
-from spec_metadata.analysis_metadata import ResponsesAnalysis, FieldMatchingData
-from spec_metadata.component_metadata import ComponentMetadata
-from specification_matcher.response_matcher import match_response
+from app.basic_operations import comparison_operations as comp
+from app.spec_metadata.analysis_metadata import ResponsesAnalysis, FieldMatchingData
+from app.spec_metadata.component_metadata import ComponentMetadata
+from app.specification_matcher.response_matcher import match_response
 
 
 def match_responses(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,

@@ -2,7 +2,7 @@ import copy
 import re
 from typing import Optional
 
-from definitions import ANALYSIS_COMPONENTS
+from app.definitions import ANALYSIS_COMPONENTS
 
 regex_ref = r'^#\/components\/([\w]+)\/([\w]+)'
 

@@ -1,8 +1,8 @@
 from functools import reduce
 from typing import Optional
 
-from definitions import ANALYSIS_COMPONENTS
-from spec_metadata.component_metadata import ComponentMetadata
+from app.definitions import ANALYSIS_COMPONENTS
+from app.spec_metadata.component_metadata import ComponentMetadata
 
 
 class FieldMatchingData(object):

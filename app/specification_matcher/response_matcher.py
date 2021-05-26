@@ -1,8 +1,8 @@
-from basic_operations.comparison_operations import add_field_comparison
-from spec_metadata.analysis_metadata import ResponseAnalysis
-from spec_metadata.component_metadata import ComponentMetadata
-from specification_matcher.header_matcher import match_header
-from specification_matcher.media_type_matcher import match_media_type
+from app.basic_operations.comparison_operations import add_field_comparison
+from app.spec_metadata.analysis_metadata import ResponseAnalysis
+from app.spec_metadata.component_metadata import ComponentMetadata
+from app.specification_matcher.header_matcher import match_header
+from app.specification_matcher.media_type_matcher import match_media_type
 
 
 def match_response(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,

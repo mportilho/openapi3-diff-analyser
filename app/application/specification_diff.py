@@ -1,6 +1,6 @@
-from reporting.component_report import create_component_report, create_paths_report
-from specification_matcher.components_matcher import match_components
-from specification_matcher.path_matcher import match_paths
+from app.reporting.component_report import create_component_report, create_paths_report
+from app.specification_matcher.components_matcher import match_components
+from app.specification_matcher.path_matcher import match_paths
 
 
 def run_diff(openapi_obk: dict, openapi_api: dict) -> tuple[str, str]:

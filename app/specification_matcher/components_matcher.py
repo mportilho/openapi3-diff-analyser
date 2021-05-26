@@ -1,12 +1,12 @@
-from basic_operations.comparison_operations import add_field_comparison
-from definitions import ANALYSIS_COMPONENTS
-from spec_metadata.analysis_metadata import ComponentsAnalysis
-from spec_metadata.component_metadata import analyse_components
-from specification_matcher.header_matcher import match_header
-from specification_matcher.parameter_matcher import match_parameter
-from specification_matcher.request_body_matcher import match_request_body
-from specification_matcher.responses_matcher import match_responses
-from specification_matcher.schema_matcher import match_schema
+from app.basic_operations.comparison_operations import add_field_comparison
+from app.definitions import ANALYSIS_COMPONENTS
+from app.spec_metadata.analysis_metadata import ComponentsAnalysis
+from app.spec_metadata.component_metadata import analyse_components
+from app.specification_matcher.header_matcher import match_header
+from app.specification_matcher.parameter_matcher import match_parameter
+from app.specification_matcher.request_body_matcher import match_request_body
+from app.specification_matcher.responses_matcher import match_responses
+from app.specification_matcher.schema_matcher import match_schema
 
 
 def match_components(base_api_spec: dict, target_api_spec: dict) -> ComponentsAnalysis:

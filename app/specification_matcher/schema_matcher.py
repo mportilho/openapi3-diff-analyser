@@ -1,9 +1,9 @@
 import copy
 
-from basic_operations.comparison_operations import compare_fields, add_field_comparison
-from definitions import ANALYSIS_SCHEMA_FIELDS
-from spec_metadata.analysis_metadata import SchemaAnalysis
-from spec_metadata.component_metadata import ComponentMetadata
+from app.basic_operations.comparison_operations import compare_fields, add_field_comparison
+from app.definitions import ANALYSIS_SCHEMA_FIELDS
+from app.spec_metadata.analysis_metadata import SchemaAnalysis
+from app.spec_metadata.component_metadata import ComponentMetadata
 
 
 def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,

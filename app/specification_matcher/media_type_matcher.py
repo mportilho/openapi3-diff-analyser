@@ -1,7 +1,7 @@
-from basic_operations.comparison_operations import add_field_comparison
-from spec_metadata.analysis_metadata import MediaTypeAnalysis
-from spec_metadata.component_metadata import ComponentMetadata
-from specification_matcher import schema_matcher
+from app.basic_operations.comparison_operations import add_field_comparison
+from app.spec_metadata.analysis_metadata import MediaTypeAnalysis
+from app.spec_metadata.component_metadata import ComponentMetadata
+from app.specification_matcher import schema_matcher
 
 
 def match_media_type(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,

@@ -5,7 +5,7 @@ from io import BytesIO
 import yaml
 from flask import Flask, request, send_file
 
-from application.specification_diff import run_diff
+from app.application.specification_diff import run_diff
 
 UPLOAD_FOLDER = 'c:/dev/temp'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'yml', 'yaml'}

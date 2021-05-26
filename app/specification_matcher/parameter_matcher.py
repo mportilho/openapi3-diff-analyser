@@ -1,8 +1,8 @@
-from basic_operations.comparison_operations import compare_fields, add_field_comparison
-from definitions import ANALYSIS_PARAMETERS_FIELDS
-from spec_metadata.analysis_metadata import ParameterAnalysis, GenericAnalysis
-from spec_metadata.component_metadata import ComponentMetadata
-from specification_matcher import schema_matcher, media_type_matcher
+from app.basic_operations.comparison_operations import compare_fields, add_field_comparison
+from app.definitions import ANALYSIS_PARAMETERS_FIELDS
+from app.spec_metadata.analysis_metadata import ParameterAnalysis, GenericAnalysis
+from app.spec_metadata.component_metadata import ComponentMetadata
+from app.specification_matcher import media_type_matcher, schema_matcher
 
 
 def match_parameters(components: dict[str, ComponentMetadata], base_spec: dict,

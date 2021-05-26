@@ -1,9 +1,9 @@
-from basic_operations.comparison_operations import add_field_comparison
-from spec_metadata.analysis_metadata import OperationAnalysis
-from spec_metadata.component_metadata import ComponentMetadata
-from specification_matcher.parameter_matcher import match_parameters
-from specification_matcher.request_body_matcher import match_request_body
-from specification_matcher.responses_matcher import match_responses
+from app.basic_operations.comparison_operations import add_field_comparison
+from app.spec_metadata.analysis_metadata import OperationAnalysis
+from app.spec_metadata.component_metadata import ComponentMetadata
+from app.specification_matcher.parameter_matcher import match_parameters
+from app.specification_matcher.request_body_matcher import match_request_body
+from app.specification_matcher.responses_matcher import match_responses
 
 
 def match_operation(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,

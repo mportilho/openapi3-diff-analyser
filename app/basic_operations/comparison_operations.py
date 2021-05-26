@@ -1,7 +1,7 @@
 import copy
 from typing import Optional, Callable, Any
 
-from spec_metadata.analysis_metadata import FieldMatchingData, GenericAnalysis
+from app.spec_metadata.analysis_metadata import FieldMatchingData, GenericAnalysis
 
 
 def is_equal(obj_a, obj_b):

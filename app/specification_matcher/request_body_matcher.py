@@ -1,7 +1,7 @@
-from basic_operations.comparison_operations import add_field_comparison
-from spec_metadata.analysis_metadata import RequestBodyAnalysis
-from spec_metadata.component_metadata import ComponentMetadata
-from specification_matcher import media_type_matcher
+from app.basic_operations.comparison_operations import add_field_comparison
+from app.spec_metadata.analysis_metadata import RequestBodyAnalysis
+from app.spec_metadata.component_metadata import ComponentMetadata
+from app.specification_matcher import media_type_matcher
 
 
 def match_request_body(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
