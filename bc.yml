@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: api-diff-openapi3-template
+  annotations:
+    description: "Description"
+    iconClass: "icon-redis"
+    tags: "database,nosql"
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: api-diff-openapi3
+    labels:
+      app: api-diff-openapi3
+  spec:
+    source:
+      type: Git
+      contextDir: "/"
+      git:
+        uri: https://github.com/mportilho/openapi3-diff-analyser.git
+    strategy:
+      type: Docker
+    output:
+      to:
+        kind: ImageStreamTag
+        name: api-diff-openapi3:latest
