@@ -15,15 +15,15 @@ def _load_yaml(openbk_swagger_path: Path):
 
 
 def run_local_program():
-    openapi_obk = _load_yaml(Path(ROOT_DIR, "../resources", "specs_obk", "swagger_common_apis.yaml"))
+    openapi_obk = _load_yaml(Path(ROOT_DIR, "..", "resources", "specs_obk", "swagger_common_apis.yaml"))
     # openapi_obk_control = _load_yaml(Path(ROOT_DIR, "resources", "specs_obk", "swagger_channels_apis_control.yaml"))
-    openapi_api = _load_yaml(Path(ROOT_DIR, "../resources", "specs_api", "api-comuns.yaml"))
+    openapi_api = _load_yaml(Path(ROOT_DIR, "..", "resources", "specs_api", "api-comuns.yaml"))
 
     error_final, final = run_diff(openapi_obk, openapi_api)
 
-    with open(Path(ROOT_DIR, '../target', 'complete_report.md'), 'w', encoding='utf-8') as file:
+    with open(Path(ROOT_DIR, '..', 'target', 'complete_report.md'), 'w', encoding='utf-8') as file:
         file.write(final)
-    with open(Path(ROOT_DIR, '../target', 'error_report.md'), 'w', encoding='utf-8') as file:
+    with open(Path(ROOT_DIR, '..', 'target', 'error_report.md'), 'w', encoding='utf-8') as file:
         file.write(error_final)
 
 

@@ -12,14 +12,14 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'yml', 'yaml'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/analyse-openapi3-spec/upload/', methods=['POST'])
+@app.route('/openapi-diff/files/', methods=['POST'])
 def analyse_openapi3():
     # check if the post request has the file part
     if 'base_spec' not in request.files or 'target_spec' not in request.files:
