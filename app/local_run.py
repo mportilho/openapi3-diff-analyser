@@ -18,10 +18,8 @@ def _load_yaml(openbk_swagger_path: Path):
 def run_local_program(base_spec_file: Path, target_spec_file: Path, output_location: Optional[Path] = None):
     if output_location is None:
         output_location = Path(ROOT_DIR, 'target')
-    elif output_location.is_dir():
-        output_location.mkdir(exist_ok=True)
     else:
-        raise Exception(f"Given output location '{output_location.absolute()}' is not a directory")
+        output_location.mkdir(exist_ok=True)
 
     openapi_obk = _load_yaml(base_spec_file)
     openapi_api = _load_yaml(target_spec_file)

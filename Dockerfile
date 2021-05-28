@@ -20,10 +20,13 @@ FROM python:3.9.5 AS release
 # Create app directory
 WORKDIR /app
 
+# Install app dependencies
 COPY --from=dependencies /app/requirements.txt ./
 COPY --from=dependencies /root/.cache /root/.cache
-
-# Install app dependencies
 RUN pip install -r requirements.txt
+
+ARG SERVER_PORT=5000
+ENV SERVER_PORT=${SERVER_PORT}
+
 COPY --from=build /app/ ./
-CMD [ "python", "main.py", "--server" ]
+CMD python main.py --server=${SERVER_PORT}
