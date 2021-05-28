@@ -50,6 +50,10 @@ Options:
 
 - **--server=[]**: Starts up a REST API Server listening on port 5000 by default or a given port number.
 - **-b, --base**: Path to the OpenAPI3 specification base file for comparison.
+- -rt=[], --report_type=[]: 
+  - FILE: creates error and full reports on the output_dir
+  - ERROR: returns the error report to the console
+  - FULL: returns the full report to the console
 - **-t, --target**: Path to the OpenAPI3 specification target file for comparison.
 - **-o, --output_dir**: Optional directory for writing comparison reports. Defaults to './target'.
 - **-h, --help**: prints help doc

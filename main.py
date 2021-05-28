@@ -22,6 +22,10 @@ USAGE: REST API Server:
 
 Options:
     --server=[]: Starts up a REST API Server listening on port 5000 by default or a given port number.
+    -rt, --report_type: 
+        FILE: creates error and full reports on the output_dir
+        ERROR: returns the error report to the console
+        FULL: returns the full report to the console
     -b, --base: Path to the OpenAPI3 specification base file for comparison.
     -t, --target: Path to the OpenAPI3 specification target file for comparison.
     -o, --output_dir: Optional directory for writing comparison reports. Defaults to './target'. 
@@ -34,6 +38,7 @@ def run_local(opts):
     base_file = ''
     target_file = ''
     output_dir = ''
+    report_type = 'ERROR'
     for opt, arg in opts:
         if opt in ('-h', '--help'):
             print_usage()
@@ -44,13 +49,15 @@ def run_local(opts):
             target_file = arg
         elif opt in ("-o", "--output_dir"):
             output_dir = arg
+        elif opt in ("-rt", "--report_type"):
+            output_dir = arg
     output_dir = Path(output_dir) if output_dir != '' else Path(ROOT_DIR, 'target')
-    local_program.run_local_program(Path(base_file), Path(target_file), output_dir)
+    local_program.run_local_program(Path(base_file), Path(target_file), output_dir, report_type)
 
 
 def main(argv: list[str]):
-    short_ops = ''.join(['h', 'b:', 't:', 'o:'])
-    long_ops = ['help', 'base_file=', 'target_file=', 'output_dir=', 'server=']
+    short_ops = ''.join(['h', 'b:', 't:', 'rt:', 'o:'])
+    long_ops = ['help', 'base_file=', 'target_file=', 'output_dir=', 'server=', 'report_type=']
     try:
         opts, args = getopt.getopt(argv, short_ops, long_ops)
     except getopt.GetoptError:
