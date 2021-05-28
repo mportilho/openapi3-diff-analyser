@@ -34,11 +34,12 @@ docker run -p 8083:8083 -e SERVER_PORT=8083 openapi3-diff-analyser:latest
 #### CURL Example
 
 ```bash
-curl --request POST \
-  --url http://localhost:5000/openapi-diff/files/ \
-  --header 'Content-Type: multipart/form-data; boundary=---011000010111000001101001' \
-  --form 'base_spec=@C:\openapi3-diff-analyser\resources\specs_obk\swagger_channels_apis.yaml' \
+curl -k --request POST 
+  --url http://localhost:5000/openapi-diff/files/ 
+  --header 'Content-Type: multipart/form-data; boundary=---011000010111000001101001' 
+  --form 'base_spec=@C:\openapi3-diff-analyser\resources\specs_obk\swagger_channels_apis.yaml' 
   --form 'target_spec=@C:\openapi3-diff-analyser\resources\specs_api\api-canais-atendimento.yaml'
+  -o report.zip
 ```
 
 #### Javascript Axios Example

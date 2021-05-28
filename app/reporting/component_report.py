@@ -63,30 +63,30 @@ def _create_schema_report(indent: int, schema: SchemaAnalysis, is_root=True, pre
         r_items = _create_schema_report(indent, prop, False, is_root)
         content.report.extend(r_items.report)
         _add_error_report(header, r_items.error_report, content)
-
     return content
 
 
-def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
+def _create_resume_schemas(indent: int, comp_analysis: ComponentsAnalysis) -> Reporting:
     content = Reporting()
 
     with open(Path(ROOT_DIR, 'resources', 'schema_description.txt'), 'r', encoding='utf-8') as file:
         content.all(file.read())
 
+    base_schemas = set(comp_analysis.components_metadata['base'].get_component('schemas').keys())
+    target_schemas = set(comp_analysis.components_metadata['target'].get_component('schemas').keys())
+
     content.all(f"{_indent(indent)} Schemas Presentes\n")
-    if comp_analysis.get_schemas():
-        presence = set(comp_analysis.get_field('schemas').get_expected_value()).intersection(
-            comp_analysis.get_field('schemas').get_current_value())
+    presence = base_schemas.intersection(target_schemas)
+    if presence:
         content.all(f"{len(presence)} schemas encontrados:\n")
         for name in presence:
             content.all(f"- {name}")
     else:
         content.all('Nenhum schema encontrado\n')
 
-    content.all(f"\n{_indent(indent)} Schemas Ausentes\n")
-    if comp_analysis.get_schemas():
-        presence = set(comp_analysis.get_field('schemas').get_expected_value()).difference(
-            comp_analysis.get_field('schemas').get_current_value())
+    content.all(f"{_indent(indent)} Schemas Ausentes\n")
+    presence = base_schemas.difference(target_schemas)
+    if presence:
         content.all(f"{len(presence)} schemas encontrados:\n")
         for name in presence:
             content.all(f"- {name}")
@@ -94,15 +94,19 @@ def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
         content.all('Nenhum schema encontrado\n')
 
     content.all(f"\n{_indent(indent)} Schemas Extras Presentes\n")
-    if comp_analysis.get_schemas():
-        presence = set(comp_analysis.get_field('schemas').get_current_value()).difference(
-            comp_analysis.get_field('schemas').get_expected_value())
+    presence = target_schemas.difference(base_schemas)
+    if presence:
         content.all(f"{len(presence)} schemas encontrados:\n")
         for name in presence:
             content.all(f"- {name}")
     else:
         content.all('Nenhum schema encontrado\n')
 
+    return content
+
+
+def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
+    content = _create_resume_schemas(indent, comp_analysis)
     schema_report = Reporting()
     for c_item in comp_analysis.get_schemas().values():
         report = _create_schema_report(indent, cast(SchemaAnalysis, c_item))
@@ -258,7 +262,12 @@ def create_operations_report(indent, operations: dict[str, OperationAnalysis]):
 def create_paths_report(paths_analysis: PathsAnalysis) -> Reporting:
     indent = 1
     content = Reporting()
-    content.all(f"{_indent(indent)} Paths\n")
+    header = f"{_indent(indent)} Paths\n"
+    content.all(header)
+
+    f_content = create_field_report(paths_analysis.fields)
+    content.report.extend(f_content.report)
+    _add_error_report(header, f_content.error_report, content)
 
     indent += 1
     for path_item in paths_analysis.path_items:
@@ -291,11 +300,18 @@ def create_component_report(component_analysis: ComponentsAnalysis) -> Reporting
     content.all(f"{_indent(indentation)} Components\n")
 
     indentation += 1
-    for comp_name, comp in component_analysis.components.items():
-        if 'schemas' == comp_name:
-            content.all(f"{_indent(indentation)} Schemas\n")
-            s_report = _prepare_schema_report(indentation + 1, component_analysis)
-            content.report.extend(s_report.report)
-            content.error_report.extend(s_report.error_report)
+    if component_analysis.components.items():
+        for comp_name, comp in component_analysis.components.items():
+            if 'schemas' == comp_name:
+                content.all(f"{_indent(indentation)} Schemas\n")
+                s_report = _prepare_schema_report(indentation + 1, component_analysis)
+                content.report.extend(s_report.report)
+                content.error_report.extend(s_report.error_report)
+    else:
+        header = f"{_indent(indentation)} Schemas\n"
+        content.all(header)
+        s_content = _create_resume_schemas(indentation + 1, component_analysis)
+        content.report.extend(s_content.report)
+        _add_error_report(header, s_content.error_report, content)
 
     return content

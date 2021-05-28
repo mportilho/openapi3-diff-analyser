@@ -47,7 +47,3 @@ def analyse_openapi3():
         memory_file.seek(0)
         return send_file(memory_file, download_name='diff_report.zip', as_attachment=True)
     return 'No processable files'
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')

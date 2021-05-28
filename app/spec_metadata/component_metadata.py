@@ -29,6 +29,9 @@ class ComponentMetadata(object):
             return self._components[groups[0]][groups[1]]
         return None
 
+    def get_component(self, component_name: str) -> dict:
+        return self._components[component_name]
+
 
 def analyse_components(openapi_spec: dict) -> ComponentMetadata:
     component_metadata = ComponentMetadata()
