@@ -75,23 +75,23 @@ def _create_resume_schemas(indent: int, comp_analysis: ComponentsAnalysis) -> Re
     base_schemas = set(comp_analysis.components_metadata['base'].get_component('schemas').keys())
     target_schemas = set(comp_analysis.components_metadata['target'].get_component('schemas').keys())
 
-    content.all(f"{_indent(indent)} Schemas Presentes\n")
+    content.all(f"\n{_indent(indent)} Schemas Presentes\n")
     presence = base_schemas.intersection(target_schemas)
     if presence:
         content.all(f"{len(presence)} schemas encontrados:\n")
         for name in presence:
             content.all(f"- {name}")
     else:
-        content.all('Nenhum schema encontrado\n')
+        content.all('Nenhum schema encontrado')
 
-    content.all(f"{_indent(indent)} Schemas Ausentes\n")
+    content.all(f"\n{_indent(indent)} Schemas Ausentes\n")
     presence = base_schemas.difference(target_schemas)
     if presence:
         content.all(f"{len(presence)} schemas encontrados:\n")
         for name in presence:
             content.all(f"- {name}")
     else:
-        content.all('Nenhum schema encontrado\n')
+        content.all('Nenhum schema encontrado')
 
     content.all(f"\n{_indent(indent)} Schemas Extras Presentes\n")
     presence = target_schemas.difference(base_schemas)
@@ -100,7 +100,7 @@ def _create_resume_schemas(indent: int, comp_analysis: ComponentsAnalysis) -> Re
         for name in presence:
             content.all(f"- {name}")
     else:
-        content.all('Nenhum schema encontrado\n')
+        content.all('Nenhum schema encontrado')
 
     return content
 
