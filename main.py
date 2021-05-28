@@ -49,14 +49,14 @@ def run_local(opts):
             target_file = arg
         elif opt in ("-o", "--output_dir"):
             output_dir = arg
-        elif opt in ("-rt", "--report_type"):
-            output_dir = arg
+        elif opt in ("-r", "--report_type"):
+            report_type = arg
     output_dir = Path(output_dir) if output_dir != '' else Path(ROOT_DIR, 'target')
     local_program.run_local_program(Path(base_file), Path(target_file), output_dir, report_type)
 
 
 def main(argv: list[str]):
-    short_ops = ''.join(['h', 'b:', 't:', 'rt:', 'o:'])
+    short_ops = ''.join(['h', 'b:', 't:', 'r:', 'o:'])
     long_ops = ['help', 'base_file=', 'target_file=', 'output_dir=', 'server=', 'report_type=']
     try:
         opts, args = getopt.getopt(argv, short_ops, long_ops)
