@@ -47,8 +47,8 @@ curl --request POST \
 import axios from "axios";
 
 const form = new FormData();
-form.append("base_spec", "C:\\Users\\marce\\git\\openapi3-diff-analyser\\resources\\specs_obk\\swagger_channels_apis.yaml");
-form.append("target_spec", "C:\\Users\\marce\\git\\openapi3-diff-analyser\\resources\\specs_api\\api-canais-atendimento.yaml");
+form.append("base_spec", "C:\\openapi3-diff-analyser\\resources\\specs_obk\\swagger_channels_apis.yaml");
+form.append("target_spec", "C:\\openapi3-diff-analyser\\resources\\specs_api\\api-canais-atendimento.yaml");
 
 const options = {
   method: 'POST',
