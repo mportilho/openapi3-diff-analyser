@@ -1,7 +1,7 @@
 from functools import reduce
 from typing import Optional
 
-from app.definitions import ANALYSIS_COMPONENTS
+from definitions import ANALYSIS_COMPONENTS
 from app.spec_metadata.component_metadata import ComponentMetadata
 
 

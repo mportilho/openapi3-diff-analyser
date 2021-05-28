@@ -8,7 +8,7 @@ import yaml
 import app.api_server as server
 import app.local_run as local_program
 from app.application.specification_diff import run_diff
-from app.definitions import ROOT_DIR
+from definitions import ROOT_DIR
 
 cmd_example = 'main.py -i <inputfile> -o <outputfile>'
 
@@ -47,7 +47,7 @@ def run_local(opts):
             output_file = arg
     print('Input file is "', input_file)
     print('Output file is "', output_file)
-    local_program.run_local_program(Path(input_file), Path(output_file), ROOT_DIR)
+    local_program.run_local_program(Path(input_file), Path(output_file), Path(ROOT_DIR, 'target'))
 
 
 def main(argv: list[str]):

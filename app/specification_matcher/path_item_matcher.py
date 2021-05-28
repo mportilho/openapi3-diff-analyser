@@ -1,5 +1,5 @@
 from app.basic_operations.comparison_operations import add_field_comparison
-from app.definitions import ANALYSIS_HTTP_REQ_METHODS
+from definitions import ANALYSIS_HTTP_REQ_METHODS
 from app.spec_metadata.analysis_metadata import PathItemAnalysis
 from app.spec_metadata.component_metadata import ComponentMetadata
 from app.specification_matcher.operation_matcher import match_operation

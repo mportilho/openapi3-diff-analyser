@@ -1,5 +1,5 @@
 from app.basic_operations.comparison_operations import add_field_comparison
-from app.definitions import ANALYSIS_COMPONENTS
+from definitions import ANALYSIS_COMPONENTS
 from app.spec_metadata.analysis_metadata import ComponentsAnalysis
 from app.spec_metadata.component_metadata import analyse_components
 from app.specification_matcher.header_matcher import match_header
