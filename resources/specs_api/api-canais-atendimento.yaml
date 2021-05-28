@@ -720,32 +720,32 @@ components:
           description: "Número de telefone da dependência - se houver"
     BranchPhone:
       type: object
-        properties:
-          type:
-            type: string
-            enum:
-              - FIXO
-              - MOVEL
-            example: "FIXO"
-            description: "Identificação do Tipo de telefone da dependência. p.ex.FIXO, MOVEL."
-          countryCallingCode:
-            type: string
-            maxLength: 4
-            pattern: ^\d{1,4}$
-            example: "55"
-            description: "Número de DDI (Discagem Direta Internacional) para  telefone de acesso ao Canal - se houver. p.ex. '55'"
-          areaCode:
-            type: string
-            maxLength: 2
-            pattern: ^\d{2}$
-            example: "19"
-            description: "Número de DDD (Discagem Direta à Distância) do telefone da dependência - se houver. p.ex. '19'"
-          number:
-            type: string
-            maxLength: 11
-            pattern: '^([0-9]{8,11})$'
-            example: "35721199"
-            description: "Número de telefone da dependência - se houver"
+      properties:
+        type:
+          type: string
+          enum:
+            - FIXO
+            - MOVEL
+          example: "FIXO"
+          description: "Identificação do Tipo de telefone da dependência. p.ex.FIXO, MOVEL."
+        countryCallingCode:
+          type: string
+          maxLength: 4
+          pattern: ^\d{1,4}$
+          example: "55"
+          description: "Número de DDI (Discagem Direta Internacional) para  telefone de acesso ao Canal - se houver. p.ex. '55'"
+        areaCode:
+          type: string
+          maxLength: 2
+          pattern: ^\d{2}$
+          example: "19"
+          description: "Número de DDD (Discagem Direta à Distância) do telefone da dependência - se houver. p.ex. '19'"
+        number:
+          type: string
+          maxLength: 11
+          pattern: '^([0-9]{8,11})$'
+          example: "35721199"
+          description: "Número de telefone da dependência - se houver"
     BranchIdentification:
       type: object
       properties:
@@ -1493,20 +1493,20 @@ components:
           example: '-180.836519'
     BankingAgentsGeographicCoordinates:
       type: object
-        description: Informação referente a geolocalização informada.
-        properties:
-          latitude:
-            description: Informação da latitude referente a geolocalização informada.
-            type: string
-            pattern: ^-?\d{1,2}\.\d{1,9}$
-            maxLength: 13
-            example: '-90.8365180'
-          longitude:
-            description: Informação da longitude referente a geolocalização informada.
-            type: string
-            pattern: ^-?\d{1,3}\.\d{1,8}$
-            maxLength: 13
-            example: '-180.836519'
+      description: Informação referente a geolocalização informada.
+      properties:
+        latitude:
+          description: Informação da latitude referente a geolocalização informada.
+          type: string
+          pattern: ^-?\d{1,2}\.\d{1,9}$
+          maxLength: 13
+          example: '-90.8365180'
+        longitude:
+          description: Informação da longitude referente a geolocalização informada.
+          type: string
+          pattern: ^-?\d{1,3}\.\d{1,8}$
+          maxLength: 13
+          example: '-180.836519'
     LinksPaginated:
       type: object
       required:

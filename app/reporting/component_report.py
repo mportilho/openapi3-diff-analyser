@@ -70,7 +70,7 @@ def _create_schema_report(indent: int, schema: SchemaAnalysis, is_root=True, pre
 def _prepare_schema_report(indent: int, comp_analysis: ComponentsAnalysis):
     content = Reporting()
 
-    with open(Path(ROOT_DIR, '..', 'resources', 'schema_description.txt'), 'r', encoding='utf-8') as file:
+    with open(Path(ROOT_DIR, 'app', 'resources', 'schema_description.txt'), 'r', encoding='utf-8') as file:
         content.all(file.read())
 
     content.all(f"{_indent(indent)} Schemas Presentes\n")

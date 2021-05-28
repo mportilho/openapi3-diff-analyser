@@ -1,6 +1,7 @@
 import os
+from pathlib import Path
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__)), '..')  # This is your Project Root
 
 ANALYSIS_COMPONENTS = ['schemas', 'responses', 'parameters', 'requestBodies', 'headers']
 ANALYSIS_SCHEMA_FIELDS = ['required', 'type', 'enum', 'format', 'minimum', 'maximum', 'exclusiveMinimum',

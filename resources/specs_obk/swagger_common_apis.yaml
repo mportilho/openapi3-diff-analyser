@@ -43,7 +43,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseDiscoveryOutageList'
+                $ref: '#/components/schemas/ResponseDiscoveryOutagesList'
 components:
   schemas:
     ResponseDiscoveryStatusList:
@@ -63,7 +63,7 @@ components:
               $ref: '#/components/schemas/LinksPaginated'
             meta:
               $ref: '#/components/schemas/MetaPaginated'
-    ResponseDiscoveryOutageList:
+    ResponseDiscoveryOutagesList:
       type: object
       required:
         - data
