@@ -1,9 +1,9 @@
 import copy
 
 from app.basic_operations.comparison_operations import compare_fields, add_field_comparison
-from definitions import ANALYSIS_SCHEMA_FIELDS
 from app.spec_metadata.analysis_metadata import SchemaAnalysis
-from app.spec_metadata.component_metadata import ComponentMetadata
+from app.spec_metadata.component_metadata import ComponentMetadata, ComponentMetadataObject
+from definitions import ANALYSIS_SCHEMA_FIELDS
 
 
 def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_spec: dict,
@@ -23,10 +23,13 @@ def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_
             return match_schema(components, name, base_spec, comp_obj.get_spec())
 
     analysis = SchemaAnalysis(spec_name)
+    base_spec = _resolve_schema_references(components['base'], base_spec)
+    target_spec = _resolve_schema_references(components['target'], target_spec)
+
     analysis.fields = compare_fields(ANALYSIS_SCHEMA_FIELDS, base_spec, target_spec)
 
-    base_properties = _compose_properties(components['base'], base_spec)
-    target_properties = _compose_properties(components['target'], target_spec)
+    base_properties = base_spec['properties']
+    target_properties = target_spec['properties']
     if base_properties or target_properties:
         add_field_comparison(analysis, 'properties', {'properties': base_properties}, {'properties': target_properties},
                              lambda a: list(a.keys()))
@@ -44,15 +47,49 @@ def match_schema(components: dict[str, ComponentMetadata], spec_name: str, base_
     return analysis
 
 
-def _compose_properties(component: ComponentMetadata, schema: dict) -> dict:
+def _resolve_schema_references(component: ComponentMetadata, schema: dict) -> dict:
+    composed_schema = copy.deepcopy(schema)
+    references = _compose_schemas(component, schema)
+    if 'properties' in references:
+        composed_schema['properties'] = references['properties']
+    if 'required' in references:
+        composed_schema['required'] = references['required']
+    return composed_schema
+
+
+def _compose_schemas(component: ComponentMetadata, schema: dict) -> dict:
     # dynamic_field_list = ['allOf', 'oneOf', 'anyOf', 'not']
-    properties = copy.deepcopy(schema['properties']) if 'properties' in schema else {}
+    fields = {
+        'properties': schema['properties'] if 'properties' in schema else {},
+        'required': schema['required'] if 'required' in schema else []
+    }
+
     if 'allOf' in schema:
         for curr_schema in schema['allOf']:
-            comp_metadata = component.get_component_by_ref(curr_schema['$ref'])
-            ref_schema_props = comp_metadata.get_spec()['properties']
-            for prop_name in ref_schema_props:
-                if prop_name not in properties:
-                    properties[prop_name] = ref_schema_props[prop_name]
-                    properties[prop_name]['$$_NAME'] = prop_name + f":allOf({comp_metadata.name})"
-    return properties
+            ref_comp_metadata = component.get_component_by_ref(curr_schema['$ref'])
+            ref_schema = ref_comp_metadata.get_spec()
+            ref_fields = {
+                'properties': ref_schema['properties'] if 'properties' in ref_schema else {},
+                'required': ref_schema['required'] if 'required' in ref_schema else []
+            }
+            _compose_fields(ref_comp_metadata, ref_fields, fields, 'allOf')
+
+            # Calling transitive references
+            transitive_fields = _compose_schemas(component, ref_schema)
+            _compose_fields(ref_comp_metadata, transitive_fields, fields, 'allOf')
+
+    return fields
+
+
+def _compose_fields(component_metadata: ComponentMetadataObject, ref_fields: dict, target_fields: dict,
+                    origin_name: str):
+    # Coping 'properties' fields
+    for prop_name in ref_fields['properties']:
+        if prop_name not in target_fields['properties']:
+            target_fields['properties'][prop_name] = ref_fields['properties'][prop_name]
+            target_fields['properties'][prop_name]['$$_NAME'] = prop_name + f":{origin_name}({component_metadata.name})"
+
+    # Coping 'required' field
+    for schema_required in ref_fields['required']:
+        if schema_required not in target_fields['required']:
+            target_fields['required'].append(schema_required)
